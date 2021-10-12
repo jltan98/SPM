@@ -1,13 +1,13 @@
 import unittest
 from unittest import mock
 from datetime import datetime
-from enrolment import Learner, Trainer, Course, Classes
-# from learner import Learner
-# from trainer import Trainer
-# from course import Course
-# from classes import Classes
+from learner import Learner
+from trainer import Trainer
+from course import Course
+from classes import Classes
+# from enrolment import Learner, Trainer, Course, Classes
 
-class TestEnrolment(unittest.TestCase):
+class TestViewEligibleCourses(unittest.TestCase):
     # Check if learner is eligible for the course
     def test_eligibility(self):
         learner = Learner("Phris", "phris@smu.edu.sg", ["IS111","IS212", "IS213", "IS215"])
