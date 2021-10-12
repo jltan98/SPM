@@ -20,12 +20,6 @@ class Learner:
 
     def get_coursesTaken(self):
         return self.coursesTaken
-        
-    def checkCourseTaken(self, courseID):
-        if (courseID not in self.coursesTaken):
-            return self.coursesTaken
-        else:
-            raise Exception("Course already taken before")
 
     def courseEligibility(self, prerequisite):
         check = "True"
@@ -37,4 +31,4 @@ class Learner:
         else: 
             raise Exception("Ineligible - did not fulfil prerequisite")
 
-learner1 = Learner('Phris', "L001", "phris@smu.edu.sg", ["IS111", "IS213", "IS215"])
+learner1 = Learner('Phris', "L001", "phris@smu.edu.sg", ["IS111","IS212", "IS213", "IS215"])

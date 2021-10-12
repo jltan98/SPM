@@ -31,9 +31,9 @@ class Classes:
         if self.noOfSlots > 0:
             return self.noOfSlots
         elif self.noOfSlots == 0:
-            raise Exception("not available for registration")
+            raiseExceptions("not available for registration")
         else:
-            raise Exception("invalid - should not be negative")
+            raiseExceptions("invalid - should not be negative")
 
     def get_trainerAssignedID(self):
         return self.trainerAssignedID

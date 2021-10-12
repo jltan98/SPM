@@ -8,23 +8,25 @@ from classes import Classes
 # from enrolment import Learner, Trainer, Course, Classes
 
 class TestViewEligibleCourses(unittest.TestCase):
-    # Check if learner is eligible for the course
+    # Check if learner is eligible for the course, and course must not be taken before
     def test_eligibility(self):
-        learner = Learner("Phris", "phris@smu.edu.sg", ["IS111","IS212", "IS213", "IS215"])
+        learner = Learner('Phris', "L001", "phris@smu.edu.sg", ["IS111", "IS213", "IS215"])      
         course = Course('IS212', "Software Project Management", "Software project management is dedicated to the planning, scheduling, resource allocation, execution, tracking, and delivery of software and web projects.", ["IS111", "IS213"], 1, ["G1"], "Software Development")
         prerequisite = course.get_prerequisite()
-        check = learner.courseEligibility(prerequisite)
-        self.assertTrue(check)
+        self.assertEqual(prerequisite, ["IS111", "IS213"])
+        # course must not be taken before
+        self.assertTrue(course.get_courseID() not in learner.get_coursesTaken())
+        self.assertRaises(Exception, learner.checkCourseTaken)
+        # if prerequisite has been cleared
+        self.assertEqual(learner.courseEligibility(prerequisite), learner.get_coursesTaken())
+        self.assertRaises(Exception, learner.courseEligibility)
 
     # number of slots available for registration
     def test_existSlots(self):
         class1 = Classes("G1", "IS213", 20, "T001", datetime(2021, 10, 27), datetime(2022, 1, 31), [])
         slots = class1.get_noOfSlots()
-        # evaluate true if number of slots is more than 0
-        self.assertTrue(slots > 0)
-        # check if exception is raised for negative number of slots
+        self.assertEqual(slots, 20)
         self.assertRaises(Exception, slots, -1)
-        # check if exception is raised for 0 slots
         self.assertRaises(Exception, slots, 0)
 
     # start and end date of classes are stipulated
@@ -40,11 +42,6 @@ class TestViewEligibleCourses(unittest.TestCase):
         course = Course('IS212', "Software Project Management", "Software project management is dedicated to the planning, scheduling, resource allocation, execution, tracking, and delivery of software and web projects.", ["IS111", "IS213"], 1, ["G1"], "Software Development")
         desc = course.get_courseDescription()
         self.assertEqual(desc, "Software project management is dedicated to the planning, scheduling, resource allocation, execution, tracking, and delivery of software and web projects.")
-
-    # sort by earliest start date of classes of courses
-    # check if this is needed since it seems more of a UI tasks
-    def test_sortClasses(self):
-        pass
 
     # assigned trainer is indicated for each classes
     def test_existTrainer(self):

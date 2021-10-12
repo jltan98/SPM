@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from datetime import datetime
 from trainer import Trainer
 
 
@@ -26,3 +27,5 @@ class TestViewTrainers(unittest.TestCase):
         self.assertEqual(skill, ["project management", "product services", "software development"])
         self.assertEqual(exp, "3-years experience in customer service...")
 
+if __name__ == "__main__":
+    unittest.main()
