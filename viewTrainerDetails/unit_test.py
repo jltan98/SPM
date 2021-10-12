@@ -1,10 +1,7 @@
 import unittest
 from unittest import mock
-from datetime import datetime
-from learner import Learner
 from trainer import Trainer
-from course import Course
-from classes import Classes
+
 
 class TestViewTrainers(unittest.TestCase):
     # Check if trainer exists >> ID, Name
