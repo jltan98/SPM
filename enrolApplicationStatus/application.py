@@ -39,9 +39,8 @@ class Application:
         newStatus = status.replace(status, updatedStatus)
         return newStatus
     
-    def checkEnrolmentPeriod(self):
-        today = datetime.now()
-        if (today > self.get_regEndDate()):
+    def checkEnrolmentPeriod(self, date):
+        if (date > self.get_regEndDate()):
             raise Exception("Self-enrolment Period is over on", self.get_regEndDate, ".")
         return True
 

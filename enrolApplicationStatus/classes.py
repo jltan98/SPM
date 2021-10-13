@@ -27,10 +27,7 @@ class Classes:
         return self.courseID
 
     def get_noOfSlots(self):
-        if self.noOfSlots > 0:
-            return self.noOfSlots
-        else:
-            raise Exception("invalid - should not be negative")
+        return self.noOfSlots
 
     def get_trainerAssignedID(self):
         return self.trainerAssignedID
