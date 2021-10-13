@@ -1,6 +1,6 @@
 from datetime import datetime
 import array
-from logging import raiseExceptions
+from logging import Exception
 
 # figure array - how it works
 
@@ -30,8 +30,6 @@ class Classes:
     def get_noOfSlots(self):
         if self.noOfSlots > 0:
             return self.noOfSlots
-        elif self.noOfSlots == 0:
-            raise Exception("not available for registration")
         else:
             raise Exception("invalid - should not be negative")
 
