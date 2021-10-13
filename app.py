@@ -76,6 +76,28 @@ class Trainer(db.Model):
             'coursesTaught': self.coursesTaught,
         }
 
+class Administrator(db.Model):
+    __tablename__ = 'administrator'
+
+    adminName = db.Column(db.String(64))
+    adminID = db.Column(db.String(64), primary_key=True)
+    adminContact = db.Column(db.String(255))
+
+    def __init__(self,
+                 adminName="",
+                 adminID="",
+                 adminContact="",):
+        self.adminName = adminName
+        self.adminID = adminID
+        self.adminContact = adminContact
+
+    def json(self):
+        return {
+            'adminName': self.adminName,
+            'adminID': self.adminID,
+            'adminContact': self.adminContact
+        }
+
 class Course(db.Model):
     __tablename__ = 'course'
 
@@ -118,7 +140,7 @@ class Classes(db.Model):
     __tablename__ = 'classes'
 
     classID = db.Column(db.String(64), primary_key=True)
-    courseID = db.Column(db.Integer, db.ForeignKey('course.courseID'))
+    courseID = db.Column(db.Integer, db.ForeignKey('course.courseID'), primary_key=True)
     noOfSlots = db.Column(db.Integer, default=0)
     trainerAssignedID = db.Column(db.Integer, db.ForeignKey('trainer.trainerID'))
     startDate = db.Column(db.DateTime)
@@ -149,6 +171,43 @@ class Classes(db.Model):
             'endDate': self.endDate,
         }
 
+class Application(db.Model):
+    __tablename__ = 'application'
+
+    applicationID = db.Column(db.Integer, primary_key=True) #auto increment
+    applicationLearnerID = db.Column(db.String(64), db.ForeignKey('learner.learnerID'))
+    applicationClassID = db.Column(db.String(64), db.ForeignKey('classes.classID'))
+    applicationStatus = db.Column(db.String(64))
+    regStartDate = db.Column(db.DateTime)
+    regEndDate = db.Column(db.DateTime)
+    adminID = db.Column(db.String(64), db.ForeignKey('admin.adminID'))
+
+    def __init__(self,
+                 applicationID=0,
+                 applicationLearnerID="",
+                 applicationClassID="",
+                 applicationStatus="", 
+                 regStartDate=datetime,
+                 regEndDate=datetime,
+                 adminID=""):
+        self.applicationID = applicationID
+        self.applicationLearnerID = applicationLearnerID
+        self.applicationClassID = applicationClassID
+        self.applicationStatus = applicationStatus
+        self.regStartDate = regStartDate
+        self.regEndDate = regEndDate
+        self.adminID = adminID
+
+    def json(self):
+        return {
+            'applicationID': self.applicationID,
+            'applicationLearnerID': self.applicationLearnerID,
+            'applicationClassID': self.applicationClassID,
+            'applicationStatus': self.applicationStatus,
+            'regStartDate': self.regStartDate,
+            'regEndDate': self.regEndDate,
+            'adminID': self.adminID
+        }
 
 @app.route("/learners/<string:learnerID>")
 def learner_by_id(learnerID):
@@ -174,6 +233,19 @@ def trainer_by_id(trainerID):
             "message": "Trainer ID not found."
         }), 404
 
+@app.route("/admins/<string:adminID>")
+def admin_by_id(adminID):
+    admin = Administrator.query.filter_by(adminID=adminID).first()
+    if admin:
+        return jsonify({
+            "data": admin.json()
+        }), 200
+    else:
+        return jsonify({
+            "message": "Admin ID not found."
+        }), 404
+
+
 @app.route("/courses/<string:courseID>")
 def course_by_id(courseID):
     course = Course.query.filter_by(courseID=courseID).first()
@@ -198,6 +270,17 @@ def class_by_id(classID, courseID):
             "message": "Class ID not found."
         }), 404
 
+@app.route("/application/<string:applicationID>")
+def application_by_id(applicationID):
+    application = Application.query.filter_by(applicationID=applicationID).first()
+    if application:
+        return jsonify({
+            "data": application.json()
+        }), 200
+    else:
+        return jsonify({
+            "message": "Application ID not found."
+        }), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
