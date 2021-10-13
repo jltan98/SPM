@@ -1,6 +1,5 @@
 from datetime import datetime
 import array
-from logging import Exception
 
 # figure array - how it works
 
