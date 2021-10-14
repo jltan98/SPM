@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS `learner` (
 
 
 INSERT INTO `learner` (`learnerName`, `learnerID`, `learnerContact`, `coursesTaken`) VALUES
-('Alivia', 'L001', 'alivia@lms.com', "['IS111', 'IS213', 'IS215']"),
-('Stella', 'L002', 'stella@lms.com', "['IS110', 'IS111']"),
-('Natalie', 'L003', 'natalie@lms.com', "['IS212']"),
-('Lyndy', 'L004', 'lyndy@lms.com', "['IS110']"),
-('Mabel', 'L005', 'mabel@lms.com', "[]");
+('Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215"),
+('Stella', 'L002', 'stella@lms.com', "IS110, IS111"),
+('Natalie', 'L003', 'natalie@lms.com', "IS212"),
+('Lyndy', 'L004', 'lyndy@lms.com', "IS110"),
+('Mabel', 'L005', 'mabel@lms.com', "");
 
 DROP TABLE IF EXISTS `trainer`;
 CREATE TABLE IF NOT EXISTS `trainer` (
@@ -45,11 +45,11 @@ CREATE TABLE IF NOT EXISTS `trainer` (
 
 
 INSERT INTO `trainer` (`trainerName`, `trainerID`, `trainerContact`, `skills`, `experience`, `coursesTaught`) VALUES
-('Anne', 'T001', 'anne@lms.com', "['Process Change Management', 'Aftersales IT Support', 'Software Development']", "8 years experience in IT operation", "['IS111', 'IS212', 'IS213', 'IS216']"),
-('Bill', 'T002', 'bill@lms.com', "['Business Analytics', 'Product Management', 'IT Solutions and Support']", "5 years experience in IT product analysis and 2 years experience in sales and support", "['IS111', 'IS212', 'IS214']"),
-('Catty', 'T003', 'catty@lms.com', "['Product Marketing', 'IT Solutions and Support']", "5 years experience in Sales and Marketing and 3 years experience in IT support", "['IS111', 'IS213']"),
-('Dia', 'T004', 'dia@lms.com', "['Product Support', 'Customer Relationship Management']", "10 years experience in customer service for IT products", "['IS200', 'IS111', 'IS446']"),
-('Elin', 'T005', 'elin@lms.com', "['IT Support', 'Product Management']", "2 years experience in IT support and 3 year experience as senior product manager", "['IS200', 'IS111', 'IS214']");
+('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development", "8 years experience in IT operation", "IS111, IS212, IS213, IS216"),
+('Bill', 'T002', 'bill@lms.com', "Business Analytics, Product Management, IT Solutions and Support", "5 years experience in IT product analysis and 2 years experience in sales and support", "IS111, IS212, IS214"),
+('Catty', 'T003', 'catty@lms.com', "Product Marketing, IT Solutions and Support", "5 years experience in Sales and Marketing and 3 years experience in IT support", "IS111, IS213"),
+('Dia', 'T004', 'dia@lms.com', "Product Support, Customer Relationship Management", "10 years experience in customer service for IT products", "IS200, IS111, IS446"),
+('Elin', 'T005', 'elin@lms.com', "IT Support, Product Management", "2 years experience in IT support and 3 year experience as senior product manager", "IS200, IS111, IS214");
 
 DROP TABLE IF EXISTS `administrator`;
 CREATE TABLE IF NOT EXISTS `administrator` (
@@ -81,11 +81,11 @@ CREATE TABLE IF NOT EXISTS `course` (
 
 
 INSERT INTO `Course` (`courseID`, `courseName`, `courseDescription`, `prerequisite`, `noOfClasses`, `classes`, `subjectcategory`) VALUES
-('IS212', 'Software Project Management', '...', "['IS111', 'IS213']", 2, "['G1', 'G2']", 'Project Management'),
-('IS111', 'Python Programming', '...', "[]", 5, "['G1', 'G2', 'G3', 'G4', 'G5']", 'Programming'),
-('IS213', 'Solution Development', '...', "['IS111']", 2, "['G1', 'G2']", 'Programming'),
-('IS214', 'Analytics Foundation', '...', "['IS111']", 1, "['G1']", 'Analytics'),
-('IS200', 'Customer Support', '...', "['IS111']", 2, "['G1', 'G2']", 'Support');
+('IS212', 'Software Project Management', '...', "IS111, IS213", 2, "G1, G2", 'Project Management'),
+('IS111', 'Python Programming', '...', "", 5, "G1, G2, G3, G4, G5", 'Programming'),
+('IS213', 'Solution Development', '...', "IS111", 2, "G1, G2", 'Programming'),
+('IS214', 'Analytics Foundation', '...', "IS111", 1, "G1", 'Analytics'),
+('IS200', 'Customer Support', '...', "IS111", 2, "G1, G2", 'Support');
 
 DROP TABLE IF EXISTS `classes`;
 CREATE TABLE IF NOT EXISTS `classes` (
@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS `application` (
   `applicationID` int(11) NOT NULL AUTO_INCREMENT,
   `applicationLearnerID` varchar(64) NOT NULL,
   `applicationClassID` varchar(64) NOT NULL,
+  `applicationCourseID` varchar(64) NOT NULL,
   `applicationStatus` varchar(64) NOT NULL,
   `regStartDate` datetime NOT NULL,
   `regEndDate` datetime NOT NULL,
@@ -127,16 +128,17 @@ CREATE TABLE IF NOT EXISTS `application` (
   PRIMARY KEY (`applicationID`),
   KEY `FK_learnerID` (`applicationLearnerID`),
   KEY `FK_classID` (`applicationClassID`),
+  KEY `FK_courseID` (`applicationCourseID`),
   KEY `FK_adminID` (`adminID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO `application` (`applicationID`, `applicationLearnerID`, `applicationClassID`, `applicationStatus`, `regStartDate`, `regEndDate`, `adminID`) VALUES
-(1, 'L001', 'G1', 'Draft','2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin001'),
-(2, 'L002', 'G1', 'Processing', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin002'),
-(3, 'L003', 'G3', 'Processing', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin003'),
-(4, 'L004', 'G1', 'Draft', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin004'),
-(5, 'L005', 'G3', 'Draft', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin005');
+INSERT INTO `application` (`applicationID`, `applicationLearnerID`, `applicationClassID`, `applicationCourseID`, `applicationStatus`, `regStartDate`, `regEndDate`, `adminID`) VALUES
+(1, 'L001', 'G1', 'IS212', 'Draft','2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin001'),
+(2, 'L002', 'G1', 'IS214', 'Processing', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin002'),
+(3, 'L003', 'G3', 'IS213', 'Processing', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin003'),
+(4, 'L004', 'G1', 'IS212', 'Draft', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin001'),
+(5, 'L005', 'G3', 'IS200', 'Draft', '2021-08-01 00:00:00', '2021-09-01 00:00:00', 'admin005');
 
 
 COMMIT;

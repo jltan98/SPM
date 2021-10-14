@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_cors import CORS
+import json
 from datetime import date, datetime
 
 app = Flask(__name__)
@@ -41,6 +43,27 @@ class Learner(db.Model):
             'coursesTaken': self.coursesTaken,
         }
 
+    def courseEligibility(self, prerequisite):
+        check = "True"
+        if (", " in prerequisite):
+            prerequisiteList = prerequisite.split(", ")
+            for courseID in prerequisiteList:
+                if (courseID not in self.coursesTaken):
+                    check = "False"
+        elif (prerequisite != ""):
+            if (prerequisite not in self.coursesTaken):
+                check = "False"
+
+        if (check == "True"):
+            return self.coursesTaken
+        else: 
+            raise Exception("Ineligible - did not fulfil prerequisite")
+
+    def checkCourseTaken(self, courseID):
+        if (courseID not in self.coursesTaken):
+            return self.coursesTaken
+        else:
+            raise Exception("Course already taken before")
 
 class Trainer(db.Model):
     __tablename__ = 'trainer'
@@ -177,6 +200,7 @@ class Application(db.Model):
     applicationID = db.Column(db.Integer, primary_key=True) #auto increment
     applicationLearnerID = db.Column(db.String(64), db.ForeignKey('learner.learnerID'))
     applicationClassID = db.Column(db.String(64), db.ForeignKey('classes.classID'))
+    applicationCourseID = db.Column(db.String(64), db.ForeignKey('classes.classID'))
     applicationStatus = db.Column(db.String(64))
     regStartDate = db.Column(db.DateTime)
     regEndDate = db.Column(db.DateTime)
@@ -186,6 +210,7 @@ class Application(db.Model):
                  applicationID=0,
                  applicationLearnerID="",
                  applicationClassID="",
+                 applicationCourseID="",
                  applicationStatus="", 
                  regStartDate=datetime,
                  regEndDate=datetime,
@@ -193,6 +218,7 @@ class Application(db.Model):
         self.applicationID = applicationID
         self.applicationLearnerID = applicationLearnerID
         self.applicationClassID = applicationClassID
+        self.applicationCourseID = applicationCourseID
         self.applicationStatus = applicationStatus
         self.regStartDate = regStartDate
         self.regEndDate = regEndDate
@@ -203,11 +229,23 @@ class Application(db.Model):
             'applicationID': self.applicationID,
             'applicationLearnerID': self.applicationLearnerID,
             'applicationClassID': self.applicationClassID,
+            'applicationCourseID': self.applicationCourseID,
             'applicationStatus': self.applicationStatus,
             'regStartDate': self.regStartDate,
             'regEndDate': self.regEndDate,
             'adminID': self.adminID
         }
+
+    def changeStatus(self, updatedStatus):
+        status = self.applicationStatus
+        newStatus = status.replace(status, updatedStatus)
+        return newStatus
+    
+    def checkEnrolmentPeriod(self):
+        today = datetime.now()
+        if (today > self.regEndDate):
+            raise Exception("Self-enrolment Period is over on", self.regEndDate, ".")
+        return True
 
 @app.route("/learners/<string:learnerID>")
 def learner_by_id(learnerID):
@@ -270,17 +308,44 @@ def class_by_id(classID, courseID):
             "message": "Class ID not found."
         }), 404
 
-@app.route("/application/<string:applicationID>")
+@app.route("/applications/<string:applicationID>")
 def application_by_id(applicationID):
     application = Application.query.filter_by(applicationID=applicationID).first()
     if application:
         return jsonify({
-            "data": application.json()
+            "data": application.json(),
         }), 200
     else:
         return jsonify({
             "message": "Application ID not found."
         }), 404
+
+@app.route("/app")
+def check():
+    # try:
+        allApplication = Application.query.all()
+        app_dict = {}
+        for item in allApplication:
+            app_dict[item.applicationID] = [item.applicationLearnerID, item.applicationCourseID, item.regStartDate, item.regEndDate]
+        check = []
+        dup = []
+        for key, value in app_dict.items():
+            if value not in check:
+                check.append(value) 
+            else:
+                dup.append(str(key)+": "+str(value))
+        if (len(dup) > 0):
+            text = "Duplicated Application: <br>"
+            for item in dup:
+                if (dup.index(item) != (len(dup)-1)):
+                    text += item + "<br>"
+                else:
+                    text += item
+            return text
+        else:
+            return "There are no duplicated application."
+    # except:
+    #     return "Failed"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
