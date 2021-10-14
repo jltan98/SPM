@@ -29,7 +29,7 @@ class Learner(db.Model):
                  learnerName="",
                  learnerID="",
                  learnerContact="",
-                 coursesTaken=[]):
+                 coursesTaken=""):
         self.learnerName = learnerName
         self.learnerID = learnerID
         self.learnerContact = learnerContact
@@ -79,9 +79,9 @@ class Trainer(db.Model):
                  trainerName="",
                  trainerID="",
                  trainerContact="",
-                 skills=[],
+                 skills="",
                  experience="",
-                 coursesTaught=[]):
+                 coursesTaught=""):
         self.trainerName = trainerName
         self.trainerID = trainerID
         self.trainerContact = trainerContact
@@ -136,9 +136,9 @@ class Course(db.Model):
                  courseID="",
                  courseName="",
                  courseDescription="",
-                 prerequisite=[],
+                 prerequisite="",
                  noOfClasses=0,
-                 classes = [],
+                 classes = "",
                  subjectcategory=""):
         self.courseID = courseID
         self.courseName = courseName
@@ -320,8 +320,8 @@ def application_by_id(applicationID):
             "message": "Application ID not found."
         }), 404
 
-@app.route("/app")
-def check():
+@app.route("/application")
+def checkDuplicate():
     # try:
         allApplication = Application.query.all()
         app_dict = {}
@@ -344,8 +344,29 @@ def check():
             return text
         else:
             return "There are no duplicated application."
-    # except:
-    #     return "Failed"
+
+@app.route("/eligibleCourses/<string:learnerID>")
+def eligibleCourses(learnerID):
+    learner = Learner.query.filter_by(learnerID=learnerID).first()
+    classes = Classes.query.all()
+    eligibleClasses = []
+    
+    for session in classes:
+        course = Course.query.filter_by(courseID=session.courseID).first()
+        try:
+            if (learner.courseEligibility(course.prerequisite) == learner.coursesTaken) and (learner.checkCourseTaken(session.courseID) == learner.coursesTaken):
+                eligibleClasses.append([session.classID, session.noOfSlots, session.trainerAssignedID, session.startDate, session.endDate, course.courseID, course.courseName, course.courseDescription])
+        except:
+            pass
+    
+    if len(eligibleClasses) > 0:
+        return jsonify({
+            "data": [nclass for nclass in eligibleClasses]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Learner ID does not exist or not eligible courses."
+        }), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
