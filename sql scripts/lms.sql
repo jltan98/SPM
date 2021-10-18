@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `trainer` (
 
 INSERT INTO `trainer` (`trainerName`, `trainerID`, `trainerContact`, `skills`, `experience`, `coursesTaught`) VALUES
 ('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development", "8 years experience in IT operation", "IS111, IS212, IS213, IS216"),
-('Bill', 'T002', 'bill@lms.com', "Business Analytics, Product Management, IT Solutions and Support", "5 years experience in IT product analysis and 2 years experience in sales and support", "IS111, IS212, IS214"),
-('Catty', 'T003', 'catty@lms.com', "Product Marketing, IT Solutions and Support", "5 years experience in Sales and Marketing and 3 years experience in IT support", "IS111, IS213"),
+('Bill', 'T002', 'bill@lms.com', "Business Analytics, Product Management, IT Solutions and Support", "5 years experience in IT product analysis, 2 years experience in sales and support", "IS111, IS212, IS214"),
+('Catty', 'T003', 'catty@lms.com', "Product Marketing, IT Solutions and Support", "5 years experience in Sales and Marketing, 3 years experience in IT support", "IS111, IS213"),
 ('Dia', 'T004', 'dia@lms.com', "Product Support, Customer Relationship Management", "10 years experience in customer service for IT products", "IS200, IS111, IS446"),
-('Elin', 'T005', 'elin@lms.com', "IT Support, Product Management", "2 years experience in IT support and 3 year experience as senior product manager", "IS200, IS111, IS214");
+('Elin', 'T005', 'elin@lms.com', "IT Support, Product Management", "2 years experience in IT support, 3 year experience as senior product manager", "IS200, IS111, IS214");
 
 DROP TABLE IF EXISTS `administrator`;
 CREATE TABLE IF NOT EXISTS `administrator` (

@@ -40,23 +40,19 @@ class Learner(db.Model):
             'name': self.learnerName,
             'id': self.learnerID,
             'contact': self.learnerContact,
-            'coursesTaken': self.coursesTaken,
+            'coursesTaken': self.coursesTaken.split(", "),
         }
 
     def courseEligibility(self, prerequisite):
         check = "True"
-        if (", " in prerequisite):
-            prerequisiteList = prerequisite.split(", ")
-            for courseID in prerequisiteList:
-                if (courseID not in self.coursesTaken):
-                    check = "False"
-        elif (prerequisite != ""):
-            if (prerequisite not in self.coursesTaken):
+        prerequisiteList = prerequisite.split(", ")
+        for courseID in prerequisiteList:
+            if (courseID not in self.coursesTaken):
                 check = "False"
 
         if (check == "True"):
             return self.coursesTaken
-        else: 
+        else:
             raise Exception("Ineligible - did not fulfil prerequisite")
 
     def checkCourseTaken(self, courseID):
@@ -64,6 +60,7 @@ class Learner(db.Model):
             return self.coursesTaken
         else:
             raise Exception("Course already taken before")
+
 
 class Trainer(db.Model):
     __tablename__ = 'trainer'
@@ -94,10 +91,11 @@ class Trainer(db.Model):
             'trainerName': self.trainerName,
             'trainerID': self.trainerID,
             'trainerContact': self.trainerContact,
-            'skills': self.skills,
-            'experience': self.experience,
-            'coursesTaught': self.coursesTaught,
+            'skills': self.skills.split(", "),
+            'experience': self.experience.split(", "),
+            'coursesTaught': self.coursesTaught.split(", "),
         }
+
 
 class Administrator(db.Model):
     __tablename__ = 'administrator'
@@ -121,6 +119,7 @@ class Administrator(db.Model):
             'adminContact': self.adminContact
         }
 
+
 class Course(db.Model):
     __tablename__ = 'course'
 
@@ -138,7 +137,7 @@ class Course(db.Model):
                  courseDescription="",
                  prerequisite="",
                  noOfClasses=0,
-                 classes = "",
+                 classes="",
                  subjectcategory=""):
         self.courseID = courseID
         self.courseName = courseName
@@ -153,19 +152,22 @@ class Course(db.Model):
             'courseID': self.courseID,
             'courseName': self.courseName,
             'courseDescription': self.courseDescription,
-            'prerequisite': self.prerequisite,
+            'prerequisite': self.prerequisite.split(", "),
             'noOfClasses': self.noOfClasses,
-            'classes': self.classes,
+            'classes': self.classes.split(", "),
             'subjectcategory': self.subjectcategory,
         }
+
 
 class Classes(db.Model):
     __tablename__ = 'classes'
 
     classID = db.Column(db.String(64), primary_key=True)
-    courseID = db.Column(db.Integer, db.ForeignKey('course.courseID'), primary_key=True)
+    courseID = db.Column(db.Integer, db.ForeignKey(
+        'course.courseID'), primary_key=True)
     noOfSlots = db.Column(db.Integer, default=0)
-    trainerAssignedID = db.Column(db.Integer, db.ForeignKey('trainer.trainerID'))
+    trainerAssignedID = db.Column(
+        db.Integer, db.ForeignKey('trainer.trainerID'))
     startDate = db.Column(db.DateTime)
     endDate = db.Column(db.DateTime)
 
@@ -175,7 +177,7 @@ class Classes(db.Model):
                  noOfSlots=0,
                  trainerAssignedID="",
                  startDate='',
-                 endDate = ''
+                 endDate=''
                  ):
         self.classID = classID
         self.courseID = courseID
@@ -192,6 +194,19 @@ class Classes(db.Model):
             'trainerAssignedID': self.trainerAssignedID,
             'startDate': self.startDate,
             'endDate': self.endDate,
+        }
+
+    def eligible_json(self, course, trainer):
+        return {
+            'classID': self.classID,
+            'courseID': self.courseID,
+            'noOfSlots': self.noOfSlots,
+            'trainerName': trainer.trainerName,
+            'startDate': self.startDate,
+            'endDate': self.endDate,
+            'courseName': course.courseName,
+            'courseDescription': course.courseDescription,
+            'subjectcategory': course.subjectcategory
         }
 
 class Application(db.Model):
@@ -247,6 +262,7 @@ class Application(db.Model):
             raise Exception("Self-enrolment Period is over on", self.regEndDate, ".")
         return True
 
+
 @app.route("/learners/<string:learnerID>")
 def learner_by_id(learnerID):
     learner = Learner.query.filter_by(learnerID=learnerID).first()
@@ -258,6 +274,7 @@ def learner_by_id(learnerID):
         return jsonify({
             "message": "Learner ID not found."
         }), 404
+
 
 @app.route("/trainers/<string:trainerID>")
 def trainer_by_id(trainerID):
@@ -271,6 +288,19 @@ def trainer_by_id(trainerID):
             "message": "Trainer ID not found."
         }), 404
 
+@app.route("/trainers")
+def trainers():
+    trainers = Trainer.query.all()
+    if trainers:
+        return jsonify({
+            "data": [trainer.json() for trainer in trainers]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Trainer ID not found."
+        }), 404
+
+
 @app.route("/admins/<string:adminID>")
 def admin_by_id(adminID):
     admin = Administrator.query.filter_by(adminID=adminID).first()
@@ -283,7 +313,6 @@ def admin_by_id(adminID):
             "message": "Admin ID not found."
         }), 404
 
-
 @app.route("/courses/<string:courseID>")
 def course_by_id(courseID):
     course = Course.query.filter_by(courseID=courseID).first()
@@ -294,6 +323,18 @@ def course_by_id(courseID):
     else:
         return jsonify({
             "message": "Course ID not found."
+        }), 404
+
+@app.route("/courses")
+def courses():
+    courses = Course.query.all()
+    if courses:
+        return jsonify({
+            "data": [course for course in courses]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Courses not found."
         }), 404
 
 @app.route("/<string:courseID>/<string:classID>")
@@ -308,6 +349,18 @@ def class_by_id(classID, courseID):
             "message": "Class ID not found."
         }), 404
 
+@app.route("/classes")
+def classes():
+    classes = Classes.query.all()
+    if classes:
+        return jsonify({
+            "data": [class_n for class_n in classes]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Classes not found."
+        }), 404
+
 @app.route("/applications/<string:applicationID>")
 def application_by_id(applicationID):
     application = Application.query.filter_by(applicationID=applicationID).first()
@@ -320,7 +373,7 @@ def application_by_id(applicationID):
             "message": "Application ID not found."
         }), 404
 
-@app.route("/application")
+@app.route("/dup_application")
 def checkDuplicate():
     # try:
         allApplication = Application.query.all()
@@ -345,28 +398,32 @@ def checkDuplicate():
         else:
             return "There are no duplicated application."
 
-@app.route("/eligibleCourses/<string:learnerID>")
-def eligibleCourses(learnerID):
+@app.route("/viewEligibleCourses/<string:learnerID>")
+def viewEligibleCourses(learnerID):
     learner = Learner.query.filter_by(learnerID=learnerID).first()
     classes = Classes.query.all()
-    eligibleClasses = []
-    
+    output = []
+    outputList = []
+
     for session in classes:
         course = Course.query.filter_by(courseID=session.courseID).first()
         try:
             if (learner.courseEligibility(course.prerequisite) == learner.coursesTaken) and (learner.checkCourseTaken(session.courseID) == learner.coursesTaken):
-                eligibleClasses.append([session.classID, session.noOfSlots, session.trainerAssignedID, session.startDate, session.endDate, course.courseID, course.courseName, course.courseDescription])
+                trainer = Trainer.query.filter_by(trainerID=session.trainerAssignedID).first()
+                output = Classes.eligible_json(session, course, trainer)
+                outputList.append(output)
         except:
-            pass
-    
-    if len(eligibleClasses) > 0:
+            pass   
+
+    if len(outputList) > 0:
         return jsonify({
-            "data": [nclass for nclass in eligibleClasses]
+            "data": outputList
         }), 200
     else:
         return jsonify({
-            "message": "Learner ID does not exist or not eligible courses."
+            "message": "Learner ID does not exist or no eligible courses."
         }), 404
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
