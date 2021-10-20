@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>View Trainer Details</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .title,
+        #search {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container" class="container">
+
+        <h1 class="title display-6">View Trainer Details</h1>
+
+        <input class="form-control" id="search" type="text" placeholder="Search..">
+
+        <table id="trainersTable" class='table table-bordered'>
+            <thead class="thead-dark">
+                <tr>
+                    <th>Trainer ID</th>
+                    <th>Trainer Name</th>
+                    <th>Trainer Contact</th>
+                    <th>Trainer Skills</th>
+                    <th>Trainer Experience</th>
+                    <th>Courses Taught</th>
+                </tr>
+            </thead>
+            <tbody id="trainerDetails">
+                <tr v-for="trainer in trainersList">
+                    <td>{{ trainer.trainerID }}</td>
+                    <td>{{ trainer.trainerName }}</td>
+                    <td>{{ trainer.trainerContact }}</td>
+                    <td>
+                        <ul v-for="skill in trainer.skills">
+                            <li>{{ skill }}</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul v-for="experience in trainer.experience">
+                            <li>{{ experience }}</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul v-for="course in trainer.coursesTaught">
+                            <li>{{ course }}</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Should you require further assistance, please email the administrator at <a class="mailto"
+            href="mailto:hr@lms.com">hr@lms.com</a> </p>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#main-container',
+            data: {
+                trainersList: [],
+            },
+            mounted: function () {
+                //retrieve sessionStorage
+                axios.get('http://localhost:5001/trainers')
+                    .then(response => {
+                        this.trainersList = response.data.data;
+                    });
+
+            // },
+            // methods: {
+  
+            //     }
+            }
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#trainerDetails tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

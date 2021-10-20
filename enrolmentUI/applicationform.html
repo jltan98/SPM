@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Enrolment Application</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .title,
+        .details {
+            margin-bottom: 40px;
+        }
+
+        a {
+            text-decoration: none;
+            display: inline-block;
+            padding: 8px 16px;
+        }
+
+        a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .previous {
+            background-color: #f1f1f1;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container" class="container">
+
+        <div class="jumbotron">
+            <h1 class="title display-6">Enrolment Application Form</h1>
+            <div class="card details">
+                <div class="card-header">
+                    Application Details
+                </div>
+                <div class="card-body">
+                    <b style='text-decoration: underline'>Applicant Information</b> <br>
+                    Learner ID: {{ this.applicationLearnerID }} <br>
+                    Learner Name: {{ this.learnerDetails.name}} <br>
+                    Learner Contact: {{ this.learnerDetails.contact}} <br>
+                    <br>
+                    <b style='text-decoration: underline'>Class Details</b> <br>
+                    Applied Course: {{classDetails.courseID}} <br>
+                    Applied Class: {{classDetails.classID}} <br>
+                    Class Start Date: {{ classDetails.startDate }} <br>
+                    Class End Date: {{ classDetails.endDate }} <br>
+                    Trainer Name: {{ trainerDetails.trainerName}} <br>
+                    Trainer Contact: {{ trainerDetails.trainerContact}}
+                </div>
+            </div>
+            <div class="container">
+                <form class="applicationForm">
+                    <div class="form-check">
+                        <label> 
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox" @click=isChecked()
+                                required>
+                            I confirmed the above stated enrolment application is accurate.
+                        </label>
+                    </div>
+                    <button type="submit" @click="submit()" class="btn btn-primary" id="submit" disabled
+                        style="float: right">Submit</button>
+                </form>
+            </div>
+        </div>
+        <br>
+        <a href="./viewEligibleCourses.html" class="previous">&laquo; Previous</a>
+
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#main-container',
+            data: {
+                applicationLearnerID: "L002",
+                applicationClassID: "",
+                applicationCourseID: "",
+                applicationStatus: "",
+                classDetails: "",
+                trainerID: "",
+                trainerDetails: "",
+                enrolmentPeriodID: "",
+                learnerDetails: "",
+            },
+            mounted: function () {
+                //retrieve sessionStorage
+                this.applicationCourseID = sessionStorage.getItem("appCourseID");
+                this.applicationClassID = sessionStorage.getItem("appClassID");
+                console.log(this.applicationClassID)
+                console.log(this.applicationCourseID)
+
+                let url = "http://localhost:5001/" + this.applicationCourseID + "/" + this.applicationClassID
+                // console.log(url)
+                axios.get(url)
+                    .then(response => {
+                        this.classDetails = response.data.data;
+                        this.trainerID = this.classDetails.trainerAssignedID
+                        this.enrolmentPeriodID = this.classDetails.enrolmentPeriodID
+                        let url2 = "http://localhost:5001/trainers" + "/" + this.trainerID
+                        console.log(url2)
+                        axios.get(url2)
+                            .then(response => {
+                                this.trainerDetails = response.data.data;
+                                console.log(this.trainerDetails)
+                            });
+
+                    });
+
+                let url3 = "http://localhost:5001/learners/" + "L002"
+                axios.get(url3)
+                    .then(response => {
+                        this.learnerDetails = response.data.data;
+                        console.log(this.learnerDetails)
+                    });
+            },
+            methods: {
+                submit: function () {
+                    event.preventDefault();
+                    // add commit to database for application form
+                    axios.post('http://localhost:5001/create_applications', {
+                        applicationLearnerID: this.applicationLearnerID,
+                        applicationClassID: this.applicationClassID,
+                        applicationCourseID: this.applicationCourseID,
+                        applicationStatus: "Processing",
+                        enrolmentPeriodID: this.enrolmentPeriodID,
+                    })
+                        .then(response => {
+                            alert("Application Submitted Successfully.")
+                            window.location.replace("./application.html");
+                            return false;
+                        })
+                        .catch(error => {
+                            this.error = error.response.data.message
+                            alert(this.error)
+                            window.location.replace("./viewEligibleCourses.html");
+                        });
+                },
+                isChecked: function () {
+                    var check = document.getElementById("checkbox").checked
+                    if (check == true) {
+                        document.getElementById("submit").disabled = false;
+                    } else {
+                        document.getElementById("submit").disabled = true;
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
