@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
 from flask_cors import CORS
 import json
 from datetime import date, datetime
@@ -170,14 +169,17 @@ class Classes(db.Model):
         db.Integer, db.ForeignKey('trainer.trainerID'))
     startDate = db.Column(db.DateTime)
     endDate = db.Column(db.DateTime)
+    enrolmentPeriodID = db.Column(db.String(64), db.ForeignKey(
+        'enrolmentperiod.enrolmentPeriodID'))
 
     def __init__(self,
                  classID="",
                  courseID="",
                  noOfSlots=0,
                  trainerAssignedID="",
-                 startDate='',
-                 endDate=''
+                 startDate=datetime,
+                 endDate=datetime,
+                 enrolmentPeriodID='',
                  ):
         self.classID = classID
         self.courseID = courseID
@@ -185,6 +187,7 @@ class Classes(db.Model):
         self.trainerAssignedID = trainerAssignedID
         self.startDate = startDate
         self.endDate = endDate
+        self.enrolmentPeriodID = enrolmentPeriodID
 
     def json(self):
         return {
@@ -194,49 +197,56 @@ class Classes(db.Model):
             'trainerAssignedID': self.trainerAssignedID,
             'startDate': self.startDate,
             'endDate': self.endDate,
+            'enrolmentPeriodID': self.enrolmentPeriodID,
         }
 
     def eligible_json(self, course, trainer):
         return {
-            'classID': self.classID,
             'courseID': self.courseID,
+            'classID': self.classID,
             'noOfSlots': self.noOfSlots,
             'trainerName': trainer.trainerName,
             'startDate': self.startDate,
             'endDate': self.endDate,
             'courseName': course.courseName,
             'courseDescription': course.courseDescription,
-            'subjectcategory': course.subjectcategory
+            'subjectcategory': course.subjectcategory,
+            'enrolmentPeriodID': self.enrolmentPeriodID,
         }
+
 
 class Application(db.Model):
     __tablename__ = 'application'
 
-    applicationID = db.Column(db.Integer, primary_key=True) #auto increment
-    applicationLearnerID = db.Column(db.String(64), db.ForeignKey('learner.learnerID'))
-    applicationClassID = db.Column(db.String(64), db.ForeignKey('classes.classID'))
-    applicationCourseID = db.Column(db.String(64), db.ForeignKey('classes.classID'))
+    applicationID = db.Column(db.Integer, primary_key=True)  # auto increment
+    applicationLearnerID = db.Column(
+        db.String(64), db.ForeignKey('learner.learnerID'))
+    applicationClassID = db.Column(
+        db.String(64), db.ForeignKey('classes.classID'))
+    applicationCourseID = db.Column(
+        db.String(64), db.ForeignKey('classes.courseID'))
     applicationStatus = db.Column(db.String(64))
-    regStartDate = db.Column(db.DateTime)
-    regEndDate = db.Column(db.DateTime)
-    adminID = db.Column(db.String(64), db.ForeignKey('admin.adminID'))
+    applicationDate = db.Column(db.DateTime, default=datetime.now())
+    enrolmentPeriodID = db.Column(db.String(64), db.ForeignKey(
+        'enrolmentperiod.enrolmentPeriodID'))
+    adminID = db.Column(db.String(64), db.ForeignKey('administrator.adminID'))
 
     def __init__(self,
                  applicationID=0,
                  applicationLearnerID="",
                  applicationClassID="",
                  applicationCourseID="",
-                 applicationStatus="", 
-                 regStartDate=datetime,
-                 regEndDate=datetime,
+                 applicationStatus="",
+                 applicationDate="",
+                 enrolmentPeriodID="",
                  adminID=""):
         self.applicationID = applicationID
         self.applicationLearnerID = applicationLearnerID
         self.applicationClassID = applicationClassID
         self.applicationCourseID = applicationCourseID
         self.applicationStatus = applicationStatus
-        self.regStartDate = regStartDate
-        self.regEndDate = regEndDate
+        self.applicationDate = applicationDate
+        self.enrolmentPeriodID = enrolmentPeriodID
         self.adminID = adminID
 
     def json(self):
@@ -246,183 +256,57 @@ class Application(db.Model):
             'applicationClassID': self.applicationClassID,
             'applicationCourseID': self.applicationCourseID,
             'applicationStatus': self.applicationStatus,
-            'regStartDate': self.regStartDate,
-            'regEndDate': self.regEndDate,
+            'applicationDate': self.applicationDate,
+            'enrolmentPeriodID': self.enrolmentPeriodID,
             'adminID': self.adminID
         }
-
-    def changeStatus(self, updatedStatus):
-        status = self.applicationStatus
-        newStatus = status.replace(status, updatedStatus)
-        return newStatus
     
-    def checkEnrolmentPeriod(self):
-        today = datetime.now()
-        if (today > self.regEndDate):
-            raise Exception("Self-enrolment Period is over on", self.regEndDate, ".")
-        return True
+    def additional_json(self, course, class_n, trainer):
+        return {
+            'applicationID': self.applicationID,
+            'applicationLearnerID': self.applicationLearnerID,
+            'applicationClassID': self.applicationClassID,
+            'applicationCourseID': self.applicationCourseID,
+            'applicationStatus': self.applicationStatus,
+            'applicationDate': self.applicationDate,
+            'enrolmentPeriodID': self.enrolmentPeriodID,
+            'adminID': self.adminID,
+            'applicationCourseName': course.courseName,
+            'applicationTrainerContact': trainer.trainerContact,
+            'applicationTrainerName': trainer.trainerName,
+            'classStartDate': class_n.startDate,
+            'classEndDate': class_n.endDate
+        }
+
+    # def changeStatus(self, updatedStatus):
+    #     status = self.applicationStatus
+    #     newStatus = status.replace(status, updatedStatus)
+    #     return newStatus
+
+    def checkEnrolmentPeriod(self, applicationPeriod):
+        if (self.enrolmentPeriodID == applicationPeriod.enrolmentPeriodID):
+            if (self.applicationDate > applicationPeriod.enrolmentStartDate) and (self.applicationDate < applicationPeriod.enrolmentEndDate):
+                return True
 
 
-@app.route("/learners/<string:learnerID>")
-def learner_by_id(learnerID):
-    learner = Learner.query.filter_by(learnerID=learnerID).first()
-    if learner:
-        return jsonify({
-            "data": learner.json()
-        }), 200
-    else:
-        return jsonify({
-            "message": "Learner ID not found."
-        }), 404
+class ApplicationPeriod(db.Model):
+    __tablename__ = 'enrolmentperiod'
 
+    enrolmentPeriodID = db.Column(db.String(64), primary_key=True)
+    enrolmentStartDate = db.Column(db.DateTime)
+    enrolmentEndDate = db.Column(db.DateTime)
 
-@app.route("/trainers/<string:trainerID>")
-def trainer_by_id(trainerID):
-    trainer = Trainer.query.filter_by(trainerID=trainerID).first()
-    if trainer:
-        return jsonify({
-            "data": trainer.json()
-        }), 200
-    else:
-        return jsonify({
-            "message": "Trainer ID not found."
-        }), 404
+    def __init__(self, enrolmentPeriodID="", enrolmentStartDate="", enrolmentEndDate=""):
+        self.enrolmentPeriodID = enrolmentPeriodID
+        self.enrolmentStartDate = enrolmentStartDate
+        self.enrolmentEndDate = enrolmentEndDate
 
-@app.route("/trainers")
-def trainers():
-    trainers = Trainer.query.all()
-    if trainers:
-        return jsonify({
-            "data": [trainer.json() for trainer in trainers]
-        }), 200
-    else:
-        return jsonify({
-            "message": "Trainer ID not found."
-        }), 404
-
-
-@app.route("/admins/<string:adminID>")
-def admin_by_id(adminID):
-    admin = Administrator.query.filter_by(adminID=adminID).first()
-    if admin:
-        return jsonify({
-            "data": admin.json()
-        }), 200
-    else:
-        return jsonify({
-            "message": "Admin ID not found."
-        }), 404
-
-@app.route("/courses/<string:courseID>")
-def course_by_id(courseID):
-    course = Course.query.filter_by(courseID=courseID).first()
-    if course:
-        return jsonify({
-            "data": course.json()
-        }), 200
-    else:
-        return jsonify({
-            "message": "Course ID not found."
-        }), 404
-
-@app.route("/courses")
-def courses():
-    courses = Course.query.all()
-    if courses:
-        return jsonify({
-            "data": [course for course in courses]
-        }), 200
-    else:
-        return jsonify({
-            "message": "Courses not found."
-        }), 404
-
-@app.route("/<string:courseID>/<string:classID>")
-def class_by_id(classID, courseID):
-    class_n = Classes.query.filter_by(classID=classID, courseID=courseID).first()
-    if class_n:
-        return jsonify({
-            "data": class_n.json()
-        }), 200
-    else:
-        return jsonify({
-            "message": "Class ID not found."
-        }), 404
-
-@app.route("/classes")
-def classes():
-    classes = Classes.query.all()
-    if classes:
-        return jsonify({
-            "data": [class_n for class_n in classes]
-        }), 200
-    else:
-        return jsonify({
-            "message": "Classes not found."
-        }), 404
-
-@app.route("/applications/<string:applicationID>")
-def application_by_id(applicationID):
-    application = Application.query.filter_by(applicationID=applicationID).first()
-    if application:
-        return jsonify({
-            "data": application.json(),
-        }), 200
-    else:
-        return jsonify({
-            "message": "Application ID not found."
-        }), 404
-
-@app.route("/dup_application")
-def checkDuplicate():
-    # try:
-        allApplication = Application.query.all()
-        app_dict = {}
-        for item in allApplication:
-            app_dict[item.applicationID] = [item.applicationLearnerID, item.applicationCourseID, item.regStartDate, item.regEndDate]
-        check = []
-        dup = []
-        for key, value in app_dict.items():
-            if value not in check:
-                check.append(value) 
-            else:
-                dup.append(str(key)+": "+str(value))
-        if (len(dup) > 0):
-            text = "Duplicated Application: <br>"
-            for item in dup:
-                if (dup.index(item) != (len(dup)-1)):
-                    text += item + "<br>"
-                else:
-                    text += item
-            return text
-        else:
-            return "There are no duplicated application."
-
-@app.route("/viewEligibleCourses/<string:learnerID>")
-def viewEligibleCourses(learnerID):
-    learner = Learner.query.filter_by(learnerID=learnerID).first()
-    classes = Classes.query.all()
-    output = []
-    outputList = []
-
-    for session in classes:
-        course = Course.query.filter_by(courseID=session.courseID).first()
-        try:
-            if (learner.courseEligibility(course.prerequisite) == learner.coursesTaken) and (learner.checkCourseTaken(session.courseID) == learner.coursesTaken):
-                trainer = Trainer.query.filter_by(trainerID=session.trainerAssignedID).first()
-                output = Classes.eligible_json(session, course, trainer)
-                outputList.append(output)
-        except:
-            pass   
-
-    if len(outputList) > 0:
-        return jsonify({
-            "data": outputList
-        }), 200
-    else:
-        return jsonify({
-            "message": "Learner ID does not exist or no eligible courses."
-        }), 404
+    def json(self):
+        return {
+            'enrolmentPeriodID': self.enrolmentPeriodID,
+            'enrolmentStartDate': self.enrolmentStartDate,
+            'enrolmentEndDate': self.enrolmentEndDate,
+        }
 
 
 if __name__ == '__main__':
