@@ -36,6 +36,17 @@
 
 <body>
     <div id="main-container" class="container">
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
 
         <h1 class="title display-6">View Applications</h1>
 
@@ -82,22 +93,26 @@
                 href="mailto:hr@lms.com">hr@lms.com</a> </p>
     </div>
     <script>
+        sessionStorage
         var app = new Vue({
             el: '#main-container',
             data: {
                 applications: [],
                 classes: [],
-                courses: []
+                courses: [],
+                learnerID: "",
+                name: "",
             },
             mounted: function () {
                 //retrieve sessionStorage
-                axios.get('http://localhost:5001/applications/' + 'L002')
+                this.learnerID = sessionStorage.getItem("learnerID");
+                this.name = sessionStorage.getItem("name");
+
+                axios.get('http://localhost:5001/applications/' + this.learnerID)
                     .then(response => {
                         this.applications = response.data.data;
                         console.log(this.applications)
                     });
-
-
             },
             methods: {
                 processing: function (app) {

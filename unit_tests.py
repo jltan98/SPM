@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from app import Trainer, Learner, Administrator, Course, Classes, Application
+from classObjects import Trainer, Learner, Administrator, Course, Classes, Application, ApplicationPeriod
 
 
 class TestViewTrainers(unittest.TestCase):

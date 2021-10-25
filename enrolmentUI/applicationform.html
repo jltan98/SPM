@@ -60,7 +60,7 @@
                 </div>
                 <div class="card-body">
                     <b style='text-decoration: underline'>Applicant Information</b> <br>
-                    Learner ID: {{ this.applicationLearnerID }} <br>
+                    Learner ID: {{ this.learnerID }} <br>
                     Learner Name: {{ this.learnerDetails.name}} <br>
                     Learner Contact: {{ this.learnerDetails.contact}} <br>
                     <br>
@@ -76,7 +76,7 @@
             <div class="container">
                 <form class="applicationForm">
                     <div class="form-check">
-                        <label> 
+                        <label>
                             <input class="form-check-input" type="checkbox" value="" id="checkbox" @click=isChecked()
                                 required>
                             I confirmed the above stated enrolment application is accurate.
@@ -95,11 +95,12 @@
         var app = new Vue({
             el: '#main-container',
             data: {
-                applicationLearnerID: "L002",
+                applicationLearnerID: "",
                 applicationClassID: "",
                 applicationCourseID: "",
                 applicationStatus: "",
                 classDetails: "",
+                learnerID: "",
                 trainerID: "",
                 trainerDetails: "",
                 enrolmentPeriodID: "",
@@ -109,39 +110,34 @@
                 //retrieve sessionStorage
                 this.applicationCourseID = sessionStorage.getItem("appCourseID");
                 this.applicationClassID = sessionStorage.getItem("appClassID");
-                console.log(this.applicationClassID)
-                console.log(this.applicationCourseID)
+                this.learnerID = sessionStorage.getItem("learnerID");
 
-                let url = "http://localhost:5001/" + this.applicationCourseID + "/" + this.applicationClassID
+                let classURL = "http://localhost:5001/" + this.applicationCourseID + "/" + this.applicationClassID
+                let learnerURL = "http://localhost:5001/learners/" + this.learnerID
+
                 // console.log(url)
-                axios.get(url)
-                    .then(response => {
-                        this.classDetails = response.data.data;
+                axios.all([
+                    axios.get(classURL),
+                    axios.get(learnerURL)
+                ])
+                    .then(axios.spread((obj1, obj2) => {
+                        this.classDetails = obj1.data.data;
+                        this.learnerDetails = obj2.data.data;
                         this.trainerID = this.classDetails.trainerAssignedID
                         this.enrolmentPeriodID = this.classDetails.enrolmentPeriodID
                         let url2 = "http://localhost:5001/trainers" + "/" + this.trainerID
-                        console.log(url2)
                         axios.get(url2)
                             .then(response => {
                                 this.trainerDetails = response.data.data;
-                                console.log(this.trainerDetails)
                             });
-
-                    });
-
-                let url3 = "http://localhost:5001/learners/" + "L002"
-                axios.get(url3)
-                    .then(response => {
-                        this.learnerDetails = response.data.data;
-                        console.log(this.learnerDetails)
-                    });
+                    }));
             },
             methods: {
                 submit: function () {
                     event.preventDefault();
                     // add commit to database for application form
                     axios.post('http://localhost:5001/create_applications', {
-                        applicationLearnerID: this.applicationLearnerID,
+                        applicationLearnerID: this.learnerID,
                         applicationClassID: this.applicationClassID,
                         applicationCourseID: this.applicationCourseID,
                         applicationStatus: "Processing",

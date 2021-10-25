@@ -35,7 +35,20 @@
 </head>
 
 <body>
+
     <div id="main-container" class="container">
+
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a href="" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
 
         <h1 class="title display-6">View Eligible Courses</h1>
 
@@ -85,21 +98,27 @@
         var app = new Vue({
             el: '#main-container',
             data: {
+                name: "",
                 eligibleclasses: [],
                 applicationClassID: "",
                 applicationCourseID: "",
                 applications: [],
+                learnerID: "",
                 new: [],
             },
             mounted: function () {
                 //retrieve sessionStorage
-                axios.get('http://localhost:5001/viewEligibleCourses/' + 'L002')
+                this.learnerID = sessionStorage.getItem("learnerID");
+                this.name = sessionStorage.getItem("name");
+
+                axios.get('http://localhost:5001/viewEligibleCourses/' + this.learnerID)
                     .then(response => {
                         this.eligibleclasses = response.data.data;
                         for (i = 0; i < this.eligibleclasses.length; i++) {
                             this.eligibleclasses[i]['applicationStatus'] = "Apply for Enrolment"
                         }
                     });
+                    
             },
             methods: {
                 apply: function (index) {

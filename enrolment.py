@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import json
 from datetime import date, datetime
-from app import Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
+from classObjects import Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
 
 
 app = Flask(__name__)
@@ -12,11 +12,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
-
 db = SQLAlchemy(app)
 
 CORS(app)
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
 
 # APP ROUTING
 
@@ -124,14 +126,19 @@ def classes():
             "message": "Classes not found."
         }), 404
 
+
 @app.route("/applications/<string:applicationLearnerID>")
 def applicationStatus(applicationLearnerID):
-    applications = Application.query.filter_by(applicationLearnerID = applicationLearnerID)
+    applications = Application.query.filter_by(
+        applicationLearnerID=applicationLearnerID)
     combined = []
     for app in applications:
-        course = Course.query.filter_by(courseID=app.applicationCourseID).first()
-        class_n = Classes.query.filter_by(classID=app.applicationClassID, courseID=app.applicationCourseID).first()
-        trainer = Trainer.query.filter_by(trainerID=class_n.trainerAssignedID).first()
+        course = Course.query.filter_by(
+            courseID=app.applicationCourseID).first()
+        class_n = Classes.query.filter_by(
+            classID=app.applicationClassID, courseID=app.applicationCourseID).first()
+        trainer = Trainer.query.filter_by(
+            trainerID=class_n.trainerAssignedID).first()
         output = Application.additional_json(app, course, class_n, trainer)
         combined.append(output)
 
@@ -144,6 +151,7 @@ def applicationStatus(applicationLearnerID):
             "message": "Applications not found."
         }), 404
 
+
 @app.route("/viewEligibleCourses/<string:learnerID>")
 def viewEligibleCourses(learnerID):
     learner = Learner.query.filter_by(learnerID=learnerID).first()
@@ -155,8 +163,9 @@ def viewEligibleCourses(learnerID):
 
     for application in applications:
         if (application.applicationCourseID, application.applicationClassID) not in appList and (application.applicationStatus == "Processing"):
-            appList.append((application.applicationCourseID, application.applicationClassID))
-
+            appList.append((application.applicationCourseID,
+                           application.applicationClassID))
+    
     for session in classes:
         course = Course.query.filter_by(courseID=session.courseID).first()
         try:
@@ -167,7 +176,7 @@ def viewEligibleCourses(learnerID):
                 outputList.append(output)
         except:
             pass
-    
+
     for output in outputList:
         if (output['courseID'], output['classID']) not in appList and (output not in filteredOutputList):
             filteredOutputList.append(output)
@@ -181,17 +190,18 @@ def viewEligibleCourses(learnerID):
             "message": "Learner ID does not exist or no eligible courses."
         }), 404
 
+
 @app.route("/create_applications", methods=['POST'])
 def create_application():
     data = request.get_json()
 
-    applicationID=None
-    applicationLearnerID=data['applicationLearnerID']
-    applicationClassID=data['applicationClassID']
-    applicationCourseID=data['applicationCourseID']
-    applicationStatus=data['applicationStatus']
-    enrolmentPeriodID=data['enrolmentPeriodID']
-    applicationDate=datetime.now()
+    applicationID = None
+    applicationLearnerID = data['applicationLearnerID']
+    applicationClassID = data['applicationClassID']
+    applicationCourseID = data['applicationCourseID']
+    applicationStatus = data['applicationStatus']
+    enrolmentPeriodID = data['enrolmentPeriodID']
+    applicationDate = datetime.now()
     adminID = ""
 
     application = Application(
@@ -224,16 +234,17 @@ def create_application():
             "message": "Duplicated application. Not allowed to apply for courses taken before / Cannot apply for same course in the same enrolment period."
         }), 404
 
+
 @app.route("/updateApplicationStatus", methods=['POST', 'PUT'])
 def updateApplicationStatus():
     data = request.get_json()
     applicationID = data['applicationID']
-    application = Application.query.filter_by(applicationID = applicationID).first()
+    application = Application.query.filter_by(
+        applicationID=applicationID).first()
 
     if application:
         try:
             application.applicationStatus = data["applicationStatus"]
-            print(application.json())
             db.session.merge(application)
             db.session.commit()
             return jsonify(application.json()), 201

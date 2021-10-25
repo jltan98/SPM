@@ -36,7 +36,17 @@
 
 <body>
     <div id="main-container" class="container">
-
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
         <h1 class="title display-6">View Trainer Details</h1>
 
         <input class="form-control" id="search" type="text" placeholder="Search..">
@@ -76,25 +86,23 @@
             </tbody>
         </table>
         <p>Should you require further assistance, please email the administrator at <a class="mailto"
-            href="mailto:hr@lms.com">hr@lms.com</a> </p>
+                href="mailto:hr@lms.com">hr@lms.com</a> </p>
     </div>
     <script>
         var app = new Vue({
             el: '#main-container',
             data: {
                 trainersList: [],
+                name: "",
             },
             mounted: function () {
                 //retrieve sessionStorage
+                this.name = sessionStorage.getItem("name");
+
                 axios.get('http://localhost:5001/trainers')
                     .then(response => {
                         this.trainersList = response.data.data;
                     });
-
-            // },
-            // methods: {
-  
-            //     }
             }
         });
     </script>

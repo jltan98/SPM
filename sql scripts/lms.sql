@@ -19,24 +19,26 @@ DROP TABLE IF EXISTS `learner`;
 CREATE TABLE IF NOT EXISTS `learner` (
   `learnerName` varchar(64) NOT NULL,
   `learnerID` varchar(64) NOT NULL,
-  `learnerContact` varchar(255) NOT NULL,
+  `learnerContact` varchar(256) NOT NULL,
   `coursesTaken` text NOT NULL,
+  `password` varchar (256) NOT NULL,
   PRIMARY KEY (`learnerID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO `learner` (`learnerName`, `learnerID`, `learnerContact`, `coursesTaken`) VALUES
-('Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215"),
-('Stella', 'L002', 'stella@lms.com', "IS110, IS111"),
-('Natalie', 'L003', 'natalie@lms.com', "IS212"),
-('Lyndy', 'L004', 'lyndy@lms.com', "IS110"),
-('Mabel', 'L005', 'mabel@lms.com', "");
+INSERT INTO `learner` (`learnerName`, `learnerID`, `learnerContact`, `coursesTaken`, `password`) VALUES
+('Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215", SHA1('learner1')),
+('Stella', 'L002', 'stella@lms.com', "IS110, IS111", SHA1('learner2')),
+('Natalie', 'L003', 'natalie@lms.com', "IS212", SHA1('learner3')),
+('Lyndy', 'L004', 'lyndy@lms.com', "IS110", SHA1('learner4')),
+('Mabel', 'L005', 'mabel@lms.com', "", SHA1('learner5'));
 
 DROP TABLE IF EXISTS `trainer`;
 CREATE TABLE IF NOT EXISTS `trainer` (
   `trainerName` varchar(64) NOT NULL,
   `trainerID` varchar(64) NOT NULL,
-  `trainerContact` varchar(255) NOT NULL,
+  `trainerContact` varchar(256) NOT NULL,
+  `password` varchar (256) NOT NULL,
   `skills` text NOT NULL,
   `experience` text NOT NULL,
   `coursesTaught` text NOT NULL,
@@ -44,28 +46,29 @@ CREATE TABLE IF NOT EXISTS `trainer` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO `trainer` (`trainerName`, `trainerID`, `trainerContact`, `skills`, `experience`, `coursesTaught`) VALUES
-('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development", "8 years experience in IT operation", "IS111, IS212, IS213, IS216"),
-('Bill', 'T002', 'bill@lms.com', "Business Analytics, Product Management, IT Solutions and Support", "5 years experience in IT product analysis, 2 years experience in sales and support", "IS111, IS212, IS214"),
-('Catty', 'T003', 'catty@lms.com', "Product Marketing, IT Solutions and Support", "5 years experience in Sales and Marketing, 3 years experience in IT support", "IS111, IS213"),
-('Dia', 'T004', 'dia@lms.com', "Product Support, Customer Relationship Management", "10 years experience in customer service for IT products", "IS200, IS111, IS446"),
-('Elin', 'T005', 'elin@lms.com', "IT Support, Product Management", "2 years experience in IT support, 3 year experience as senior product manager", "IS200, IS111, IS214");
+INSERT INTO `trainer` (`trainerName`, `trainerID`, `trainerContact`, `password`, `skills`, `experience`, `coursesTaught`) VALUES
+('Anne', 'T001', 'anne@lms.com', SHA1('trainer1'), "Process Change Management, Aftersales IT Support, Software Development", "8 years experience in IT operation", "IS111, IS212, IS213, IS216"),
+('Bill', 'T002', 'bill@lms.com', SHA1('trainer2'),"Business Analytics, Product Management, IT Solutions and Support", "5 years experience in IT product analysis, 2 years experience in sales and support", "IS111, IS212, IS214"),
+('Catty', 'T003', 'catty@lms.com', SHA1('trainer3'),"Product Marketing, IT Solutions and Support", "5 years experience in Sales and Marketing, 3 years experience in IT support", "IS111, IS213"),
+('Dia', 'T004', 'dia@lms.com', SHA1('trainer4'),"Product Support, Customer Relationship Management", "10 years experience in customer service for IT products", "IS200, IS111, IS446"),
+('Elin', 'T005', 'elin@lms.com', SHA1('trainer5'),"IT Support, Product Management", "2 years experience in IT support, 3 year experience as senior product manager", "IS200, IS111, IS214");
 
 DROP TABLE IF EXISTS `administrator`;
 CREATE TABLE IF NOT EXISTS `administrator` (
   `adminName` varchar(64) NOT NULL,
   `adminID` varchar(64) NOT NULL,
-  `adminContact` varchar(255) NOT NULL,
+  `adminContact` varchar(256) NOT NULL,
+  `password` varchar (256) NOT NULL,
   PRIMARY KEY (`adminID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO `administrator` (`adminName`, `adminID`, `adminContact`) VALUES
-('Estella', 'admin001', 'estella@lms.com'),
-('Finn', 'admin002', 'finn@lms.com'),
-('Anson', 'adminL003', 'anson@lms.com'),
-('Dawn', 'admin004', 'dawn@lms.com'),
-('George', 'admin005', 'george@lms.com');
+INSERT INTO `administrator` (`adminName`, `adminID`, `adminContact`, `password`) VALUES
+('Estella', 'admin001', 'estella@lms.com', SHA1('admin1')),
+('Finn', 'admin002', 'finn@lms.com', SHA1('admin2')),
+('Anson', 'adminL003', 'anson@lms.com', SHA1('admin3')),
+('Dawn', 'admin004', 'dawn@lms.com', SHA1('admin4')),
+('George', 'admin005', 'george@lms.com', SHA1('admin5'));
 
 DROP TABLE IF EXISTS `course`;
 CREATE TABLE IF NOT EXISTS `course` (
@@ -75,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `course` (
   `prerequisite` text NOT NULL,
   `noOfClasses` int(11) NOT NULL,
   `classes` text NOT NULL,
-  `subjectcategory` varchar(255) NOT NULL,
+  `subjectcategory` varchar(256) NOT NULL,
   PRIMARY KEY (`courseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -124,12 +127,12 @@ INSERT INTO `classes` (`classID`, `courseID`, `noOfSlots`, `trainerAssignedID`, 
 ('G2', 'IS111', 15, 'T002', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
 ('G3', 'IS111', 15, 'T003', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
 ('G4', 'IS111', 15, 'T004', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G5', 'IS111', 15, 'T005', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
+('G5', 'IS111', 15, 'T005', '2021-10-05 00:00:00', '2021-12-05 00:00:00', 'FY20/21 Session 2'),
 ('G1', 'IS213', 20, 'T001', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
 ('G2', 'IS213', 20, 'T003', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
 ('G1', 'IS214', 20, 'T002', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
 ('G1', 'IS200', 20, 'T004', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G2', 'IS200', 20, 'T005', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2');
+('G2', 'IS200', 20, 'T005', '2021-10-05 00:00:00', '2021-12-05 00:00:00', 'FY20/21 Session 2');
 
 DROP TABLE IF EXISTS `application`;
 CREATE TABLE IF NOT EXISTS `application` (
