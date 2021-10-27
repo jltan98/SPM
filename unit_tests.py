@@ -71,7 +71,6 @@ class TestViewEligibleCourses(unittest.TestCase):
             'enrolmentPeriodID': 'FY20/21 Session 2',
         })
 
-
 class TestApplication(unittest.TestCase):
 
     def setUp(self):

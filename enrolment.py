@@ -8,7 +8,7 @@ from classObjects import Learner, Trainer, Administrator, Classes, Course, Appli
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
-                                        '@localhost:3306/learningmanagementsystem'
+                                        '@localhost:3306/LMS'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -133,10 +133,11 @@ def applicationStatus(applicationLearnerID):
         applicationLearnerID=applicationLearnerID)
     combined = []
     for app in applications:
+        period = ApplicationPeriod.query.filter_by(enrolmentPeriodID = app.enrolmentPeriodID).first()
         course = Course.query.filter_by(
             courseID=app.applicationCourseID).first()
         class_n = Classes.query.filter_by(
-            classID=app.applicationClassID, courseID=app.applicationCourseID).first()
+            classID=app.applicationClassID, courseID=app.applicationCourseID, enrolmentPeriodID=period.enrolmentPeriodID).first()
         trainer = Trainer.query.filter_by(
             trainerID=class_n.trainerAssignedID).first()
         output = Application.display_json(app, course, class_n, trainer)
@@ -165,15 +166,18 @@ def viewEligibleCourses(learnerID):
         if (application.applicationCourseID, application.applicationClassID) not in appList and (application.applicationStatus == "Processing"):
             appList.append((application.applicationCourseID,
                            application.applicationClassID))
-    
+
     for session in classes:
+        period = ApplicationPeriod.query.filter_by(enrolmentPeriodID=session.enrolmentPeriodID).first()
+        enddate = period.enrolmentEndDate
         course = Course.query.filter_by(courseID=session.courseID).first()
         try:
             if (learner.courseEligibility(course.prerequisite) == learner.coursesTaken) and (learner.checkCourseTaken(session.courseID) == learner.coursesTaken):
                 trainer = Trainer.query.filter_by(
                     trainerID=session.trainerAssignedID).first()
-                output = Classes.eligible_json(session, course, trainer)
-                outputList.append(output)
+                output = Classes.class_for_currEnrolmentPeriod(session, enddate, course, trainer)
+                if (output != "False"):
+                    outputList.append(output)
         except:
             pass
 
@@ -214,24 +218,33 @@ def create_application():
         enrolmentPeriodID=enrolmentPeriodID,
         adminID=adminID
     )
+      
+    enrolmentPeriod = ApplicationPeriod.query.filter_by(enrolmentPeriodID = enrolmentPeriodID).first()
+    # application needs to be within the enrolment Period
+    check = application.checkEnrolmentPeriod(enrolmentPeriod)
 
-    # there should not be application for the same course in the same term
-    dupcheck = application.query.filter_by(
-        applicationLearnerID=applicationLearnerID, applicationCourseID=applicationCourseID, enrolmentPeriodID=enrolmentPeriodID, applicationStatus=applicationStatus).count()
+    if (check == True):
+        # there should not be application for the same course in the same term
+        dupcheck = application.query.filter_by(
+            applicationLearnerID=applicationLearnerID, applicationCourseID=applicationCourseID, enrolmentPeriodID=enrolmentPeriodID, applicationStatus=applicationStatus).count()
 
-    if (dupcheck == 0):
-        try:
-            db.session.add(application)
-            db.session.commit()
-        except Exception:
+        if (dupcheck == 0):
+            try:
+                db.session.add(application)
+                db.session.commit()
+            except Exception:
+                return jsonify({
+                    "message": "Unable to commit to database."
+                }), 500
+            return jsonify(application.json()), 201
+
+        else:
             return jsonify({
-                "message": "Unable to commit to database."
-            }), 500
-        return jsonify(application.json()), 201
-
+                "message": "Duplicated application. Not allowed to apply for same course in the same enrolment period."
+            }), 404
     else:
         return jsonify({
-            "message": "Duplicated application. Not allowed to apply for same course in the same enrolment period."
+            "message": check
         }), 404
 
 

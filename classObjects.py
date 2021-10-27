@@ -180,7 +180,7 @@ class Classes(db.Model):
     startDate = db.Column(db.DateTime)
     endDate = db.Column(db.DateTime)
     enrolmentPeriodID = db.Column(db.String(64), db.ForeignKey(
-        'enrolmentperiod.enrolmentPeriodID'))
+        'enrolmentperiod.enrolmentPeriodID'), primary_key=True)
 
     def __init__(self,
                  classID="",
@@ -210,20 +210,21 @@ class Classes(db.Model):
             'enrolmentPeriodID': self.enrolmentPeriodID,
         }
 
-    def eligible_json(self, course, trainer):
-        return {
-            'courseID': self.courseID,
-            'classID': self.classID,
-            'noOfSlots': self.noOfSlots,
-            'trainerName': trainer.trainerName,
-            'startDate': self.startDate,
-            'endDate': self.endDate,
-            'courseName': course.courseName,
-            'courseDescription': course.courseDescription,
-            'subjectcategory': course.subjectcategory,
-            'enrolmentPeriodID': self.enrolmentPeriodID,
-        }
-
+    def class_for_currEnrolmentPeriod(self, enddate ,course, trainer):
+        if (self.startDate > enddate):
+            return {
+                'courseID': self.courseID,
+                'classID': self.classID,
+                'noOfSlots': self.noOfSlots,
+                'trainerName': trainer.trainerName,
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'courseName': course.courseName,
+                'courseDescription': course.courseDescription,
+                'subjectcategory': course.subjectcategory,
+                'enrolmentPeriodID': self.enrolmentPeriodID,
+            }
+        return "False"
 
 class Application(db.Model):
     __tablename__ = 'application'
