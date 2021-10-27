@@ -86,6 +86,8 @@ class TestApplication(unittest.TestCase):
         self.application1 = Application(1, "L001", "G1", "IS212", "Processing", datetime(
             2021, 10, 20), 'FY20/21 Session 2', "admin001")
         self.admin1 = Administrator('Estella', "admin001", "estella@lms.com")
+        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2', datetime(
+            2021, 10, 15), datetime(2021, 11, 30))
 
     def tearDown(self):
         self.learner = None
@@ -116,15 +118,35 @@ class TestApplication(unittest.TestCase):
             'adminContact': "estella@lms.com"}
         )
 
-    # check that application to the same course can only be made once by the Learner in each enrolment period
-    def test_checkApplication(self):
-        pass
-
     # cannot submit application after self-enrolment period
     def test_checkEnrolmentPeriod(self):
-        self.assertRaises(
-            Exception, self.application1.checkEnrolmentPeriod, datetime.now())
+        try:
+            self.assertTrue(self.application1.checkEnrolmentPeriod(self.applicationPeriod))
+        except:
+            self.assertRaises(
+                Exception, self.application1.checkEnrolmentPeriod, self.applicationPeriod)
 
+
+class TestApplicationPeriod(unittest.TestCase):
+
+    def setUp(self):
+        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2', datetime(
+            2021, 10, 15), datetime(2021, 11, 30))
+
+    def tearDown(self):
+        self.learner = None
+        self.course = None
+        self.class1 = None
+        self.trainer = None
+        self.application1 = None
+        self.admin1 = None
+
+    def test_existApplicationPeriod(self):
+        self.assertEqual(self.applicationPeriod.json(), {
+            'enrolmentPeriodID': 'FY20/21 Session 2',
+            'enrolmentStartDate': datetime(2021, 10, 15),
+            'enrolmentEndDate': datetime(2021, 11, 30)}
+        )
 
 if __name__ == "__main__":
     unittest.main()

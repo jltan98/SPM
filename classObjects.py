@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -270,7 +271,7 @@ class Application(db.Model):
             'adminID': self.adminID
         }
     
-    def additional_json(self, course, class_n, trainer):
+    def display_json(self, course, class_n, trainer):
         return {
             'applicationID': self.applicationID,
             'applicationLearnerID': self.applicationLearnerID,
@@ -285,17 +286,16 @@ class Application(db.Model):
             'applicationTrainerName': trainer.trainerName,
             'classStartDate': class_n.startDate,
             'classEndDate': class_n.endDate
-        }
-
-    # def changeStatus(self, updatedStatus):
-    #     status = self.applicationStatus
-    #     newStatus = status.replace(status, updatedStatus)
-    #     return newStatus
+        }     
 
     def checkEnrolmentPeriod(self, applicationPeriod):
         if (self.enrolmentPeriodID == applicationPeriod.enrolmentPeriodID):
             if (self.applicationDate > applicationPeriod.enrolmentStartDate) and (self.applicationDate < applicationPeriod.enrolmentEndDate):
                 return True
+            else:
+                raise Exception ("Enrolment Period has passed, not allowed to submit applications.")
+        else: 
+            raise Exception ("Enrolment period does not match up. Please check with your administrator.")
 
 
 class ApplicationPeriod(db.Model):

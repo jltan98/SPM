@@ -139,7 +139,7 @@ def applicationStatus(applicationLearnerID):
             classID=app.applicationClassID, courseID=app.applicationCourseID).first()
         trainer = Trainer.query.filter_by(
             trainerID=class_n.trainerAssignedID).first()
-        output = Application.additional_json(app, course, class_n, trainer)
+        output = Application.display_json(app, course, class_n, trainer)
         combined.append(output)
 
     if len(combined) > 0:
@@ -231,7 +231,7 @@ def create_application():
 
     else:
         return jsonify({
-            "message": "Duplicated application. Not allowed to apply for courses taken before / Cannot apply for same course in the same enrolment period."
+            "message": "Duplicated application. Not allowed to apply for same course in the same enrolment period."
         }), 404
 
 
