@@ -1,0 +1,32 @@
+ {% extends "layout.html" %} 
+ {% block content %} 
+
+  <div class="card-deck">
+    {% for application in applications%}
+      
+      <div class="card m-1">
+
+        <div class="card-body">
+          <h5 class="card-title">Application No. {{application.application_id}}</h5>
+          <h6 class="card-subtitle text-muted">{{application.learner_name}} | {{application.learner_id}}</h6>
+          
+          <p class="card-text">
+          Course: {{application.course_name}}
+          <br>Course Seats Available: [placeholder]
+          <br>Recommended to: [Reject / Approve]
+          </p>
+
+          <!-- add more details here (course details) -->
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-success">Accept</button>
+          <button class="btn btn-danger">Reject</button> 
+        </div>
+
+      </div>
+    {% endfor %} 
+
+ </div>
+ 
+{% endblock content %}
