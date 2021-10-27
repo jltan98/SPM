@@ -1,32 +1,84 @@
- {% extends "layout.html" %} 
- {% block content %} 
+{% extends "layout.html" %}
+{% block content %}
 
-  <div class="card-deck">
-    {% for application in applications%}
-      
-      <div class="card m-1">
+<div class="container">
+
+  <a class="btn btn-secondary" href="#">
+    [TODO] Select Multiple
+  </a>
+
+  <a class="btn btn-success" href="#">
+    Approve Selected
+  </a>
+
+  <a class="btn btn-danger" href="#">
+    Reject Selected
+  </a>
+
+  <a class="btn btn-secondary" href="#">
+    [TODO] Auto-Approve
+  </a>
+
+  <a class="btn btn-secondary" href="#">
+    [TODO] Auto-Reject
+  </a>
+
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
+    aria-expanded="false">
+    Filter results by:
+  </a>
+
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="#">Another action</a></li>
+    <li><a class="dropdown-item" href="#">Something else here</a></li>
+  </ul>
+
+
+</div>
+
+
+
+<div>
+
+  <!-- APPLICATIONS LIST ============================================= -->
+
+  <div class="container">
+
+    <div class="card-deck">
+
+      {% for application in applications%}
+
+      <div class="card m-3">
 
         <div class="card-body">
           <h5 class="card-title">Application No. {{application.application_id}}</h5>
           <h6 class="card-subtitle text-muted">{{application.learner_name}} | {{application.learner_id}}</h6>
-          
+
           <p class="card-text">
-          Course: {{application.course_name}}
-          <br>Course Seats Available: [placeholder]
-          <br>Recommended to: [Reject / Approve]
+            Course: {{application.course_name}}
+            <br>Course Seats Available: [placeholder]
+            <br>Recommended to: [Reject / Approve]
           </p>
 
           <!-- add more details here (course details) -->
         </div>
 
         <div class="card-footer">
-          <button class="btn btn-success">Accept</button>
-          <button class="btn btn-danger">Reject</button> 
+          <button class="btn btn-success" id="approveBtn">Approve</button>
+          <button class="btn btn-danger" id="rejectBtn">Reject</button>
         </div>
-
       </div>
-    {% endfor %} 
 
- </div>
- 
+      {% endfor %}
+
+    </div>
+
+  </div>
+</div>
+
+<!-- NOTIFICATION ================================================= -->
+
+
+
 {% endblock content %}
