@@ -3,10 +3,10 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Database: `LearningManagementSystem` 
+-- Database: `LMS` 
 --
-CREATE DATABASE IF NOT EXISTS `LearningManagementSystem` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `LearningManagementSystem`;
+CREATE DATABASE IF NOT EXISTS `LMS` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `LMS`;
 
 -- --------------------------------------------------------
 
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `enrolmentPeriod` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `enrolmentPeriod` (`enrolmentPeriodID`, `enrolmentStartDate`, `enrolmentEndDate`) VALUES
-('FY20/21 Session 1', '2021-08-01 00:00:00', '2021-09-01 00:00:00'),
+('FY20/21 Session 1', '2020-10-15 00:00:00', '2021-11-30 00:00:00'),
 ('FY20/21 Session 2', '2021-10-15 00:00:00', '2021-11-30 00:00:00');
 
 
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `classes` (
   `startDate` datetime NOT NULL,
   `endDate` datetime NOT NULL,
   `enrolmentPeriodID` varchar(64) NOT NULL,
-  PRIMARY KEY (`classID`, `courseID`),
+  PRIMARY KEY (`classID`, `courseID`, `enrolmentPeriodID`),
   KEY `FK_courseID` (`courseID`),
   KEY `FK_trainerID` (`trainerAssignedID`),
   KEY `FK_enrolmentPeriodID` (`enrolmentPeriodID`)
@@ -121,18 +121,22 @@ CREATE TABLE IF NOT EXISTS `classes` (
 
 
 INSERT INTO `classes` (`classID`, `courseID`, `noOfSlots`, `trainerAssignedID`, `startDate`, `endDate`, `enrolmentPeriodID`) VALUES
-('G1', 'IS212', 20, 'T001', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G2', 'IS212', 20, 'T002', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G1', 'IS111', 15, 'T001', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G2', 'IS111', 15, 'T002', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G3', 'IS111', 15, 'T003', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G4', 'IS111', 15, 'T004', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G5', 'IS111', 15, 'T005', '2021-10-05 00:00:00', '2021-12-05 00:00:00', 'FY20/21 Session 2'),
-('G1', 'IS213', 20, 'T001', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G2', 'IS213', 20, 'T003', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G1', 'IS214', 20, 'T002', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G1', 'IS200', 20, 'T004', '2021-10-01 00:00:00', '2021-11-30 00:00:00', 'FY20/21 Session 2'),
-('G2', 'IS200', 20, 'T005', '2021-10-05 00:00:00', '2021-12-05 00:00:00', 'FY20/21 Session 2');
+('G1', 'IS212', 20, 'T001', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G2', 'IS212', 20, 'T002', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G1', 'IS111', 15, 'T001', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G2', 'IS111', 15, 'T002', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G3', 'IS111', 15, 'T003', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G4', 'IS111', 15, 'T004', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G5', 'IS111', 15, 'T005', '2022-02-05 00:00:00', '2022-10-05 00:00:00', 'FY20/21 Session 2'),
+('G1', 'IS213', 20, 'T001', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G2', 'IS213', 20, 'T003', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G1', 'IS214', 20, 'T002', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G1', 'IS200', 20, 'T004', '2022-01-10 00:00:00', '2022-06-30 00:00:00', 'FY20/21 Session 2'),
+('G2', 'IS200', 20, 'T005', '2022-02-05 00:00:00', '2022-10-05 00:00:00', 'FY20/21 Session 2'),
+('G1', 'IS200', 20, 'T004', '2021-01-10 00:00:00', '2021-06-30 00:00:00', 'FY20/21 Session 1'),
+('G2', 'IS200', 20, 'T005', '2021-02-05 00:00:00', '2021-10-05 00:00:00', 'FY20/21 Session 1'),
+('G1', 'IS212', 20, 'T001', '2021-01-10 00:00:00', '2021-06-30 00:00:00', 'FY20/21 Session 1'),
+('G2', 'IS212', 20, 'T002', '2021-02-05 00:00:00', '2021-10-05 00:00:00', 'FY20/21 Session 1');
 
 DROP TABLE IF EXISTS `application`;
 CREATE TABLE IF NOT EXISTS `application` (
