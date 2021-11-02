@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `course` (
   `courseName` varchar(64) NOT NULL,
   `courseDescription` text NOT NULL,
   `prerequisite` text NOT NULL,
-  `noOfClasses` int(11) NOT NULL,
+  `noOfClasses` int NOT NULL,
   `classes` text NOT NULL,
   `subjectcategory` varchar(256) NOT NULL,
   PRIMARY KEY (`courseID`)
