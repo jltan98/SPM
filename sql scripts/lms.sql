@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-INSERT INTO `Course` (`courseID`, `courseName`, `courseDescription`, `prerequisite`, `noOfClasses`, `classes`, `subjectcategory`) VALUES
+INSERT INTO `course` (`courseID`, `courseName`, `courseDescription`, `prerequisite`, `noOfClasses`, `classes`, `subjectcategory`) VALUES
 ('IS212', 'Software Project Management', '...', "IS111, IS213", 2, "G1, G2", 'Project Management'),
 ('IS111', 'Python Programming', '...', "", 5, "G1, G2, G3, G4, G5", 'Programming'),
 ('IS213', 'Solution Development', '...', "IS111", 2, "G1, G2", 'Programming'),
