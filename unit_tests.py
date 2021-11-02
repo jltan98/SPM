@@ -1,37 +1,45 @@
 import unittest
-from datetime import date, datetime
-from classObjects import Trainer, Learner, Administrator, Course, Classes, Application, ApplicationPeriod
+from datetime import datetime
+from classObjects import Trainer, Learner, Administrator
+from classObjects import Course, Classes, Application, ApplicationPeriod
 
 
 class TestViewTrainers(unittest.TestCase):
     def setUp(self):
-        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development",
-                               "8 years experience in IT operation", "IS111, IS212, IS213, IS216")
+        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com',
+                               "Process Change Management, IT Support",
+                               "8 years experience in IT operation",
+                               "IS111, IS212, IS213, IS216")
 
     def tearDown(self):
         self.trainer = None
 
-    # Check if trainer exists >> ID, Name, list of courses taught, skills, experience
+    # Check if trainer exists
     def test_existTrainer(self):
         self.assertEqual(self.trainer.json(), {
             'trainerName': 'Anne',
             'trainerID': 'T001',
             'trainerContact': 'anne@lms.com',
-            'skills': ['Process Change Management', 'Aftersales IT Support', 'Software Development'],
+            'skills':
+            ['Process Change Management', 'IT Support'],
             'experience':  ["8 years experience in IT operation"],
             'coursesTaught': ["IS111", "IS212", "IS213", "IS216"]}
         )
+
 
 class TestViewEligibleCourses(unittest.TestCase):
     def setUp(self):
         self.learner = Learner(
             'Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215")
         self.course = Course('IS212', 'Software Project Management',
-                             '...', "IS111, IS213", 2, "G1, G2]", 'Project Management')
+                             '...', "IS111, IS213", 2, "G1, G2]",
+                             'Project Management')
         self.class1 = Classes("G1", "IS212", 20, "T001", datetime(
             2022, 1, 10), datetime(2022, 6, 30), 'FY20/21 Session 2')
-        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development",
-                               "8 years experience in IT operation", "IS111, IS212, IS213, IS216")
+        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com',
+                               "Process Change Management, IT Support",
+                               "8 years experience in IT operation",
+                               "IS111, IS212, IS213, IS216")
 
     def tearDown(self):
         self.learner = None
@@ -68,22 +76,28 @@ class TestViewEligibleCourses(unittest.TestCase):
             'enrolmentPeriodID': 'FY20/21 Session 2',
         })
 
+
 class TestApplication(unittest.TestCase):
 
     def setUp(self):
         self.learner = Learner(
-            'Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215")
-        self.course = Course('IS212', 'Software Project Management',
-                             '...', "IS111, IS213", 2, "G1, G2]", 'Project Management')
+                'Alivia', 'L001', 'alivia@lms.com', "IS111, IS213, IS215")
+        self.course = Course('IS212', 'Software Project Management', '...',
+                             "IS111, IS213", 2, "G1, G2",
+                             'Project Management')
         self.class1 = Classes("G1", "IS212", 20, "T001", datetime(
             2022, 1, 10), datetime(2022, 6, 30), 'FY20/21 Session 2')
-        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com', "Process Change Management, Aftersales IT Support, Software Development",
-                               "8 years experience in IT operation", "IS111, IS212, IS213, IS216")
-        self.application1 = Application(1, "L001", "G1", "IS212", "Processing", datetime(
-            2021, 10, 20), 'FY20/21 Session 2', "admin001")
+        self.trainer = Trainer('Anne', 'T001', 'anne@lms.com',
+                               "Process Change Management, IT Support",
+                               "8 years experience in IT operation",
+                               "IS111, IS212, IS213, IS216")
+        self.application1 = Application(1, "L001", "G1", "IS212", "Processing",
+                                        datetime(2021, 10, 20),
+                                        'FY20/21 Session 2', "admin001")
         self.admin1 = Administrator('Estella', "admin001", "estella@lms.com")
-        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2', datetime(
-            2021, 10, 15), datetime(2021, 11, 30))
+        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2',
+                                                   datetime(2021, 10, 15),
+                                                   datetime(2021, 11, 30))
 
     def tearDown(self):
         self.learner = None
@@ -120,30 +134,35 @@ class TestApplication(unittest.TestCase):
         try:
             self.assertTrue(self.application1.checkEnrolmentPeriod(
                 self.applicationPeriod))
-        except:
+        except Exception as e:
             self.assertRaises(
-                Exception, self.application1.checkEnrolmentPeriod, self.applicationPeriod)
+                e, self.application1.checkEnrolmentPeriod,
+                self.applicationPeriod)
 
     def test_class_for_currEnrolmentPeriod(self):
-        self.assertEqual(self.class1.class_for_currEnrolmentPeriod(self.applicationPeriod.enrolmentEndDate, self.course, self.trainer),
-                         {'courseID': self.course.courseID,
-                          'classID': self.class1.classID,
-                          'noOfSlots': self.class1.noOfSlots,
-                          'trainerName': self.trainer.trainerName,
-                          'startDate': self.class1.startDate,
-                          'endDate': self.class1.endDate,
-                          'courseName': self.course.courseName,
-                          'courseDescription': self.course.courseDescription,
-                          'subjectcategory': self.course.subjectcategory,
-                          'enrolmentPeriodID': self.class1.enrolmentPeriodID}
-                         )
+        self.assertEqual(
+            self.class1.class_for_currEnrolmentPeriod(
+                self.applicationPeriod.enrolmentEndDate,
+                self.course, self.trainer), {
+                    'courseID': self.course.courseID,
+                    'classID': self.class1.classID,
+                    'noOfSlots': self.class1.noOfSlots,
+                    'trainerName': self.trainer.trainerName,
+                    'startDate': self.class1.startDate,
+                    'endDate': self.class1.endDate,
+                    'courseName': self.course.courseName,
+                    'courseDescription': self.course.courseDescription,
+                    'subjectcategory': self.course.subjectcategory,
+                    'enrolmentPeriodID': self.class1.enrolmentPeriodID}
+                )
 
 
 class TestApplicationPeriod(unittest.TestCase):
 
     def setUp(self):
-        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2', datetime(
-            2021, 10, 15), datetime(2021, 11, 30))
+        self.applicationPeriod = ApplicationPeriod('FY20/21 Session 2',
+                                                   datetime(2021, 10, 15),
+                                                   datetime(2021, 11, 30))
 
     def tearDown(self):
         self.learner = None

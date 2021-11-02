@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import json
-from datetime import date, datetime
-from classObjects import Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
+from datetime import datetime
+from classObjects import Learner, Trainer, Administrator
+from classObjects import Classes, Course, Application, ApplicationPeriod
 
 
 app = Flask(__name__)
@@ -16,12 +16,13 @@ db = SQLAlchemy(app)
 
 CORS(app)
 
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db.session.remove()
 
-# APP ROUTING
 
+# APP ROUTING
 @app.route("/learners/<string:learnerID>")
 def learner_by_id(learnerID):
     learner = Learner.query.filter_by(learnerID=learnerID).first()
@@ -133,11 +134,14 @@ def applicationStatus(applicationLearnerID):
         applicationLearnerID=applicationLearnerID)
     combined = []
     for app in applications:
-        period = ApplicationPeriod.query.filter_by(enrolmentPeriodID = app.enrolmentPeriodID).first()
+        period = ApplicationPeriod.query.filter_by(
+            enrolmentPeriodID=app.enrolmentPeriodID).first()
         course = Course.query.filter_by(
             courseID=app.applicationCourseID).first()
         class_n = Classes.query.filter_by(
-            classID=app.applicationClassID, courseID=app.applicationCourseID, enrolmentPeriodID=period.enrolmentPeriodID).first()
+            classID=app.applicationClassID,
+            courseID=app.applicationCourseID,
+            enrolmentPeriodID=period.enrolmentPeriodID).first()
         trainer = Trainer.query.filter_by(
             trainerID=class_n.trainerAssignedID).first()
         output = Application.display_json(app, course, class_n, trainer)
@@ -163,26 +167,32 @@ def viewEligibleCourses(learnerID):
     outputList = []
 
     for application in applications:
-        if (application.applicationCourseID, application.applicationClassID) not in appList and (application.applicationStatus == "Processing"):
+        if ((application.applicationCourseID, application.applicationClassID)
+                not in appList and
+                application.applicationStatus == "Processing"):
             appList.append((application.applicationCourseID,
                            application.applicationClassID))
 
     for session in classes:
-        period = ApplicationPeriod.query.filter_by(enrolmentPeriodID=session.enrolmentPeriodID).first()
+        period = ApplicationPeriod.query.filter_by(
+            enrolmentPeriodID=session.enrolmentPeriodID).first()
         enddate = period.enrolmentEndDate
-        course = Course.query.filter_by(courseID=session.courseID).first()
-        try:
-            if (learner.courseEligibility(course.prerequisite) == learner.coursesTaken) and (learner.checkCourseTaken(session.courseID) == learner.coursesTaken):
-                trainer = Trainer.query.filter_by(
-                    trainerID=session.trainerAssignedID).first()
-                output = Classes.class_for_currEnrolmentPeriod(session, enddate, course, trainer)
-                if (output != "False"):
-                    outputList.append(output)
-        except:
-            pass
+        course = Course.query.filter_by(
+            courseID=session.courseID).first()
+        if (learner.courseEligibility(course.prerequisite)
+                == learner.coursesTaken and
+                learner.checkCourseTaken(session.courseID)
+                == learner.coursesTaken):
+            trainer = Trainer.query.filter_by(
+                trainerID=session.trainerAssignedID).first()
+            output = Classes.class_for_currEnrolmentPeriod(
+                session, enddate, course, trainer)
+            if (output != "False"):
+                outputList.append(output)
 
     for output in outputList:
-        if (output['courseID'], output['classID']) not in appList and (output not in filteredOutputList):
+        if ((output['courseID'], output['classID']) not in appList
+                and output not in filteredOutputList):
             filteredOutputList.append(output)
 
     if len(outputList) > 0:
@@ -218,15 +228,19 @@ def create_application():
         enrolmentPeriodID=enrolmentPeriodID,
         adminID=adminID
     )
-      
-    enrolmentPeriod = ApplicationPeriod.query.filter_by(enrolmentPeriodID = enrolmentPeriodID).first()
+
+    enrolmentPeriod = ApplicationPeriod.query.filter_by(
+        enrolmentPeriodID=enrolmentPeriodID).first()
     # application needs to be within the enrolment Period
     check = application.checkEnrolmentPeriod(enrolmentPeriod)
 
-    if (check == True):
+    if (check is True):
         # there should not be application for the same course in the same term
         dupcheck = application.query.filter_by(
-            applicationLearnerID=applicationLearnerID, applicationCourseID=applicationCourseID, enrolmentPeriodID=enrolmentPeriodID, applicationStatus=applicationStatus).count()
+            applicationLearnerID=applicationLearnerID,
+            applicationCourseID=applicationCourseID,
+            enrolmentPeriodID=enrolmentPeriodID,
+            applicationStatus=applicationStatus).count()
 
         if (dupcheck == 0):
             try:
@@ -240,7 +254,9 @@ def create_application():
 
         else:
             return jsonify({
-                "message": "Duplicated application. Not allowed to apply for same course in the same enrolment period."
+                "message":
+                    "Duplicated application." +
+                    "Not allowed to apply for same course."
             }), 404
     else:
         return jsonify({

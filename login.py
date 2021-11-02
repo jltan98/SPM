@@ -1,10 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import json
-from datetime import date, datetime
 from classObjects import Learner, Trainer, Administrator
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
@@ -40,7 +37,7 @@ def login_verification():
             return name
         else:
             return "Invalid Password, please try again."
-    except:
+    except Exception:
         return "Invalid User ID, please try again."
 
 

@@ -1,9 +1,7 @@
-from logging import raiseExceptions
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import json
-from datetime import date, datetime
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
@@ -210,7 +208,7 @@ class Classes(db.Model):
             'enrolmentPeriodID': self.enrolmentPeriodID,
         }
 
-    def class_for_currEnrolmentPeriod(self, enddate ,course, trainer):
+    def class_for_currEnrolmentPeriod(self, enddate, course, trainer):
         if (self.startDate > enddate):
             return {
                 'courseID': self.courseID,
@@ -225,6 +223,7 @@ class Classes(db.Model):
                 'enrolmentPeriodID': self.enrolmentPeriodID,
             }
         return "False"
+
 
 class Application(db.Model):
     __tablename__ = 'application'
@@ -271,7 +270,7 @@ class Application(db.Model):
             'enrolmentPeriodID': self.enrolmentPeriodID,
             'adminID': self.adminID
         }
-    
+
     def display_json(self, course, class_n, trainer):
         return {
             'applicationID': self.applicationID,
@@ -286,17 +285,17 @@ class Application(db.Model):
             'applicationTrainerContact': trainer.trainerContact,
             'applicationTrainerName': trainer.trainerName,
             'classStartDate': class_n.startDate,
-            'classEndDate': class_n.endDate
-        }     
+            'classEndDate': class_n.endDate}
 
-    def checkEnrolmentPeriod(self, applicationPeriod):
-        if (self.enrolmentPeriodID == applicationPeriod.enrolmentPeriodID):
-            if (self.applicationDate > applicationPeriod.enrolmentStartDate) and (self.applicationDate < applicationPeriod.enrolmentEndDate):
+    def checkEnrolmentPeriod(self, appPeriod):
+        if (self.enrolmentPeriodID == appPeriod.enrolmentPeriodID):
+            if (self.applicationDate > appPeriod.enrolmentStartDate and
+                    self.applicationDate < appPeriod.enrolmentEndDate):
                 return True
             else:
-                raise Exception ("Enrolment Period has passed, not allowed to submit applications.")
-        else: 
-            raise Exception ("Enrolment period does not match up. Please check with your administrator.")
+                raise Exception("Enrolment Period has passed.")
+        else:
+            raise Exception("Enrolment period does not match up.")
 
 
 class ApplicationPeriod(db.Model):
@@ -306,7 +305,10 @@ class ApplicationPeriod(db.Model):
     enrolmentStartDate = db.Column(db.DateTime)
     enrolmentEndDate = db.Column(db.DateTime)
 
-    def __init__(self, enrolmentPeriodID="", enrolmentStartDate="", enrolmentEndDate=""):
+    def __init__(self,
+                 enrolmentPeriodID="",
+                 enrolmentStartDate="",
+                 enrolmentEndDate=""):
         self.enrolmentPeriodID = enrolmentPeriodID
         self.enrolmentStartDate = enrolmentStartDate
         self.enrolmentEndDate = enrolmentEndDate
