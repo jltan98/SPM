@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>View Eligible Courses</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .title,
+        #search {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="main-container" class="container">
+
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a href="" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
+
+        <h1 class="title display-6">View Eligible Courses</h1>
+
+        <input class="form-control" id="search" type="text" placeholder="Search..">
+
+        <table id="eligibleCourseTable" class='table table-bordered'>
+            <thead class="thead-dark">
+                <tr>
+                    <th>Course ID</th>
+                    <th>Course Name</th>
+                    <th>Class ID</th>
+                    <th>Course Description</th>
+                    <th>Trainer Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Number of Slots Available</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="courseDetails">
+                <tr v-for="(item, index) in eligibleclasses">
+                    <td id="courseID">{{ item.courseID }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td>{{ item.classID }}</td>
+                    <td>{{ item.courseDescription }}</td>
+                    <td><a href='viewTrainers.html'>{{ item.trainerName }}</a></td>
+                    <td>{{ item.startDate }}</td>
+                    <td>{{ item.endDate }}</td>
+                    <td>{{ item.noOfSlots }}</td>
+
+                    <td v-if="hasApplied(item)"><button class="btn btn-info" style="margin: auto;"
+                            @click="apply(index)"> {{
+                            item.applicationStatus }}
+                        </button></td>
+
+                    <td v-else><button class="btn btn-secondary" style="margin: auto;" disabled @click="apply(index)">
+                            {{
+                            item.applicationStatus }}
+                        </button></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Should you require further assistance, please email the administrator at <a class="mailto"
+                href="mailto:hr@lms.com">hr@lms.com</a> </p>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#main-container',
+            data: {
+                name: "",
+                eligibleclasses: [],
+                applicationClassID: "",
+                applicationCourseID: "",
+                applications: [],
+                learnerID: "",
+                new: [],
+            },
+            mounted: function () {
+                //retrieve sessionStorage
+                this.learnerID = sessionStorage.getItem("learnerID");
+                this.name = sessionStorage.getItem("name");
+
+                axios.get('http://localhost:5001/viewEligibleCourses/' + this.learnerID)
+                    .then(response => {
+                        this.eligibleclasses = response.data.data;
+                        for (i = 0; i < this.eligibleclasses.length; i++) {
+                            this.eligibleclasses[i]['applicationStatus'] = "Apply for Enrolment"
+                        }
+                    });
+                    
+            },
+            methods: {
+                apply: function (index) {
+                    this.applicationClassID = this.eligibleclasses[index].classID
+                    this.applicationCourseID = this.eligibleclasses[index].courseID
+                    var appCourseID = sessionStorage.setItem("appCourseID", this.applicationCourseID);
+                    var appClassID = sessionStorage.setItem("appClassID", this.applicationClassID);
+                    window.location.href = "applicationform.html";
+                },
+                hasApplied: function (item) {
+                    return item.applicationStatus != "Applied"
+                }
+            }
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#courseDetails tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
