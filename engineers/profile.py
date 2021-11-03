@@ -69,6 +69,28 @@ class Learner(db.Model):
             result[column] = getattr(self, column)
         return result
 
+class Application(db.Model):
+    __tablename__ = 'application'
+    applicationID = db.Column(db.Integer, primary_key=True)
+    applicationLearnerID = db.Column(db.Integer)
+    applicationCLassID = db.Column(db.String(50))
+    applicationCourseID = db.Column(db.String(50))
+    applicationStatus = db.Column(db.String(50))
+    adminID = db.Column(db.String(50))
+    enrolmentPeriodID = db.Column(db.String(50))
+    applicationDate = db.Column(db.String(50))
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
 @app.route("/learner/<name>", methods=['GET'])
 def get_course(name):
     learner = Learner.query.filter_by(learnerName=name).first()
@@ -108,6 +130,18 @@ def get_courses():
             "message": "Person not found."
         }), 404
 
+@app.route("/applications/<learnerID>", methods=['GET'])
+def get_applications(learnerID):
+    applications = Application.query.filter_by(applicationLearnerID=learnerID).all()
+
+    if applications:
+            return jsonify({
+                "data": [application.to_dict() for application in applications]
+            }), 200
+    else:
+        return jsonify({
+            "message": "Person not found."
+        }), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002, debug=True)
