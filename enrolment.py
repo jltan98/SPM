@@ -1,15 +1,18 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import query
 from sqlalchemy.orm.query import Query 
 from sqlalchemy.sql import case
 from flask_cors import CORS
 import json
 from datetime import date, datetime
-from classObjects import Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
+
+from sqlalchemy.sql.expression import false, true
+from classObjects import ClassesStatus, Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root:root" + \
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root' + \
                                         '@localhost:8889/LMS'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
@@ -128,7 +131,6 @@ def classes():
             "message": "Classes not found."
         }), 404
 
-
 @app.route("/applications/<string:applicationLearnerID>")
 def applicationStatus(applicationLearnerID):
     applications = Application.query.filter_by(
@@ -208,7 +210,9 @@ def create_application():
     applicationStatus = data['applicationStatus']
     enrolmentPeriodID = data['enrolmentPeriodID']
     applicationDate = datetime.now()
-    adminID = ""
+    # adminID should be empty if self enroled
+    if 'adminID' in data:
+        adminID = data['adminID']
 
     application = Application(
         applicationID=applicationID,
@@ -231,15 +235,22 @@ def create_application():
             applicationLearnerID=applicationLearnerID, applicationCourseID=applicationCourseID, enrolmentPeriodID=enrolmentPeriodID, applicationStatus=applicationStatus).count()
 
         if (dupcheck == 0):
-            try:
-                db.session.add(application)
-                db.session.commit()
-            except Exception:
+            # check if slots are still available
+            slotsTaken = Application.query.filter(Application.applicationClassID==application.applicationClassID, Application.applicationCourseID==application.applicationCourseID,Application.enrolmentPeriodID==application.enrolmentPeriodID,Application.applicationStatus!='Unsuccessful',Application.applicationStatus!='Successful').count()
+            noOfSlots = Classes.query.filter_by(classID=application.applicationClassID,courseID=application.applicationCourseID,enrolmentPeriodID=application.enrolmentPeriodID).first().noOfSlots
+            if (noOfSlots - slotsTaken) > 0:
+                try:
+                    db.session.add(application,)
+                    db.session.commit()
+                except Exception:
+                    return jsonify({
+                        "message": "Unable to commit to database."
+                    }), 500
+                return jsonify(application.json()), 201
+            else:
                 return jsonify({
-                    "message": "Unable to commit to database."
-                }), 500
-            return jsonify(application.json()), 201
-
+                "message": "No slots available."
+                }), 404
         else:
             return jsonify({
                 "message": "Duplicated application. Not allowed to apply for same course in the same enrolment period."
@@ -268,8 +279,8 @@ def updateApplicationStatus():
                 "message": "Unable to commit to database."
             }), 500
 
-@app.route("/viewapplications/<string:status>")
-def viewapplications(status):
+@app.route("/viewApplications/<string:status>")
+def viewApplications(status):
     applications = Application.query.filter_by(
         applicationStatus=status)
     combined = []
@@ -328,72 +339,48 @@ def approveApplications():
     
 @app.route("/learnersClasses")
 def learnersClasses():
-    classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID)
-    classesWithPrereq=[]
-    for c in classes:
-        dictClassWithPrereq={}
-        #class
-        dictClassWithPrereq["classID"]=c[0].classID
-        dictClassWithPrereq["courseID"]=c[0].courseID
-        dictClassWithPrereq["noOfSlots"]=c[0].noOfSlots
-        dictClassWithPrereq["trainerAssignedID"]=c[0].trainerAssignedID
-        dictClassWithPrereq["enrolmentPeriodID"]=c[0].enrolmentPeriodID
-        dictClassWithPrereq["startDate"]=c[0].startDate
-        dictClassWithPrereq["endDate"]=c[0].endDate
-        dictClassWithPrereq["coursePrereq"]=c[1].prerequisite.split(',')
-        #course
-        dictCourse={}
-        dictCourse["courseID"]=c[1].courseID
-        dictCourse["courseName"]=c[1].courseName
-        dictCourse["courseDescription"]=c[1].courseDescription
-        dictCourse["subjectcategory"]=c[1].subjectcategory
-        dictCourse["prerequisite"]=c[1].prerequisite.split(',')
-        dictClassWithPrereq["courses"]=dictCourse
-        classesWithPrereq.append(dictClassWithPrereq)
+    #get all courses as dictionary, to be used later 
+    dictCourses = Course.getAllCoursesAsDictionary()
+    #get all classes with prerequisites as dictionary
+    classesWithPrereq = Classes.GetClassesJoinCoursesAsDictionary(ClassesStatus.FUTURE)
 
+    #get all learners
     learners=Learner.query.all()
+
+    #create list of learners with information about classes learners are eligible to take
+    #this list will be the primary data we will display in the html age
     learnersWithEligibleClasses=[]
+
+    #iterate all learners
     for l in learners:
+        #create dictionary to store learner details
         dictLearnerWithEligibleClasses={}
+
+        #learner details
         dictLearnerWithEligibleClasses["learnerID"]=l.learnerID
         dictLearnerWithEligibleClasses["learnerName"]=l.learnerName
         dictLearnerWithEligibleClasses["learnerContact"]=l.learnerContact
-        
-        coursesTakenIds=[]
-        #remove before and after blank spaces
-        for ctId in l.coursesTaken.split(','):
-            coursesTakenIds.append(ctId.strip())
 
-        coursesTaken=[]
-        for cid in coursesTakenIds:
-            ct = Course.query.filter(Course.courseID==cid.strip()).first()
-            if ct != None:
-                dictCourse={}
-                dictCourse["courseID"]=ct.courseID
-                dictCourse["courseName"]=ct.courseName
-                dictCourse["courseDescription"]=ct.courseDescription
-                dictCourse["subjectcategory"]=ct.subjectcategory
-                dictCourse["prerequisite"]=ct.prerequisite.split(',')
-                coursesTaken.append(dictCourse)
-        dictLearnerWithEligibleClasses["coursesTaken"]=coursesTaken
-        eligibleClasses=[]
+        #add the list of courses taken to learner details
+        dictLearnerWithEligibleClasses["coursesTaken"]=l.getCoursesTakenAsDictionary(dictCourses)
+        #add the list of eligible classes to learner details
+        dictLearnerWithEligibleClasses["eligibleClasses"]=l.getLearnerEligibleClassesAsDictionary(classesWithPrereq)
 
-        for c in classesWithPrereq:
-            if (c['courseID'] not in coursesTakenIds and c['coursePrereq'] == [''])or \
-                (c['courseID'] not in coursesTakenIds and set(c['coursePrereq']).issubset(set(coursesTakenIds))):
-                eligibleClasses.append(c)
-        dictLearnerWithEligibleClasses["eligibleClasses"]=eligibleClasses
+        #add the details of learner to list of learners
         learnersWithEligibleClasses.append(dictLearnerWithEligibleClasses)
+
+    #return the list of learner after it is converted to json
     return jsonify(learnersWithEligibleClasses), 200
-    #return learnersWithEligibleClasses
-    # if learner:
-    #     return jsonify({
-    #         "data": learner.json()
-    #     }), 200
-    # else:
-    #     return jsonify({
-    #         "message": "Learner ID not found."
-    #     }), 404
+
+@app.route("/viewClasses")
+def viewClasses():
+    classes = Classes.GetClassesJoinCoursesAsDictionary(ClassesStatus.FUTURE)
+    if classes:
+        return jsonify(classes), 200
+    else:
+        return jsonify({
+            "message": "Classes not found."
+        }), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

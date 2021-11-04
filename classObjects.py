@@ -4,10 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import json
 from datetime import date, datetime
+from sqlalchemy.sql.elements import Case
+from enums import ApplicationStatus,ClassesStatus
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root:root" + \
-                                        '@localhost:8889/lms'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root' + \
+                                        '@localhost:3306/lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -15,7 +18,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 db = SQLAlchemy(app)
 
 CORS(app)
-
 
 class Learner(db.Model):
     __tablename__ = 'learner'
@@ -63,7 +65,75 @@ class Learner(db.Model):
             return self.coursesTaken
         else:
             raise Exception("Course already taken before")
+    
+    def getCoursesTakenIDs(self):
+        coursesTakenIDs=[]
+        coursesTakenIDs=list(map(str.strip, self.coursesTaken.split(',')))
+        #coursesTakenIDs = map(lambda s:s.strip(), self.coursesTaken.split(','))
+        return coursesTakenIDs
+    
+    def getCoursesTakenAsDictionary(self,dictCourses):
+        coursesTaken=[]
+        coursesTakenIDs = self.getCoursesTakenIDs()
+        #create list of courses taken by the learner. this will store the entire course details, not just ID
+            #iterate all courses taken
+        for cid in coursesTakenIDs:
+                #get the course information from the all courses dictionary we created on top
+            if cid in dictCourses:
+                ct = dictCourses[cid]
+                    #ct = Course.query.filter(Course.courseID==cid.strip()).first()
+                if ct != None:
+                        #create dictionary to store the details
+                    dictCourseTaken={}
+                    dictCourseTaken["courseID"]=ct['courseID']
+                    dictCourseTaken["courseName"]=ct['courseName']
+                    dictCourseTaken["courseDescription"]=ct['courseDescription']
+                    dictCourseTaken["subjectcategory"]=ct['subjectcategory']
+                    dictCourseTaken["prerequisite"]=ct['prerequisite'].split(',')
 
+                        #add the details to list of courses taken
+                    coursesTaken.append(dictCourseTaken)
+        return coursesTaken
+
+    def getLearnerCurrentAppliedCoursesAsDictionary(self):
+        #create list of learner applied courses
+        learnerCurrentAppliedCourses=[]
+
+        #get all outstanding applications by learner (status != successful and unsuccessful)
+        learnerOutstandingApplications = Application.query.filter(Application.applicationLearnerID==self.learnerID,Application.applicationStatus!='Successful',Application.applicationStatus!='Unsuccessful')
+
+        #iterate learners current applications
+        for learnerApplication in learnerOutstandingApplications:
+            #details
+            learnerCurrentAppliedCourses.append(learnerApplication.applicationCourseID)
+        
+        return learnerCurrentAppliedCourses
+
+    def getLearnerEligibleClassesAsDictionary(self,classesWithPrereq):
+        learnerCurrentAppliedCourses=self.getLearnerCurrentAppliedCoursesAsDictionary()
+        coursesTakenIDs = self.getCoursesTakenIDs()
+        #create list of eligible classes for the learner
+        eligibleClasses=[]
+
+            #iterate all classes with prerequisites
+        for c in classesWithPrereq:
+            if datetime.now()>=c["startDate"]:
+                continue
+                #the learner is eligible to class if the course assigned to class if
+                #course is not in the list of courses taken by learner and the course has no prerequisite
+                #or course is not in the list of courses taken by learner and all prerequisites are already taken
+            if (c['courseID'] not in coursesTakenIDs and c['coursePrereq'] == [''])or \
+                    (c['courseID'] not in coursesTakenIDs and set(c['coursePrereq']).issubset(set(coursesTakenIDs))):
+                eligibleClassesDetails={}
+                eligibleClassesDetails["class"]=c
+                inprogress=False
+                if c['courseID'] in learnerCurrentAppliedCourses:
+                    inprogress=True
+                    
+                eligibleClassesDetails["inprogress"]=inprogress
+
+                eligibleClasses.append(eligibleClassesDetails)
+        return eligibleClasses
 
 class Trainer(db.Model):
     __tablename__ = 'trainer'
@@ -166,7 +236,26 @@ class Course(db.Model):
             'classes': self.classes.split(", "),
             'subjectcategory': self.subjectcategory,
         }
+    def getAllCoursesAsDictionary():
+        #retrieve all courses from database using Course class
+        allCourses = Course.query.all()
 
+        #create dictionary of courses so that when we want to get particular course
+        #we would just put the course id in index e.g. dictCourses["IS111"]
+        dictCourses={}
+        #iterate all courses
+        for course in allCourses:
+            #create dictionary for details
+            dictCourseDetail={}
+            dictCourseDetail["courseID"]=course.courseID
+            dictCourseDetail["courseName"]=course.courseName
+            dictCourseDetail["courseDescription"]=course.courseDescription
+            dictCourseDetail["subjectcategory"]=course.subjectcategory
+            dictCourseDetail["prerequisite"]=course.prerequisite
+
+            #assign the current course to the course id in dictionary
+            dictCourses[course.courseID]=dictCourseDetail
+        return dictCourses
 
 class Classes(db.Model):
     __tablename__ = 'classes'
@@ -225,6 +314,65 @@ class Classes(db.Model):
                 'enrolmentPeriodID': self.enrolmentPeriodID,
             }
         return "False"
+        
+    def GetClassesByStatus(classesStatus):
+        if classesStatus==ClassesStatus.FUTURE:
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.startDate>datetime.now())
+            return classes
+        elif classesStatus==ClassesStatus.PAST:
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.endDate<datetime.now())
+            return classes
+        elif classesStatus==ClassesStatus.STARTED:
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.startDate<=datetime.now(),Classes.endDate>=datetime.now())
+            return classes
+        else:
+            #all classes past present future
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID)
+            return classes
+        
+    def GetClassesJoinCoursesAsDictionary(classesStatus=ClassesStatus.ALL):
+        #get classes based on status
+        classes = Classes.GetClassesByStatus(classesStatus)
+        db.session.close()
+        #create list of classes. We will add the course prerequisite information
+        classesWithPrereq=[]
+
+        #iterate all classes
+        for c in classes:
+            #create dictionary to store the class details
+            #we want dictionary so we can easily convert to json later
+            dictClassWithPrereq={}
+
+            #class details. c[0] is for Classes, c[1] is for Course. In db.session.query(Classes,Course), Classes index =0, Course index=1
+            dictClassWithPrereq["classID"]=c[0].classID
+            dictClassWithPrereq["courseID"]=c[0].courseID
+            dictClassWithPrereq["noOfSlots"]=c[0].noOfSlots
+            dictClassWithPrereq["trainerAssignedID"]=c[0].trainerAssignedID
+            dictClassWithPrereq["enrolmentPeriodID"]=c[0].enrolmentPeriodID
+            dictClassWithPrereq["startDate"]=c[0].startDate
+            dictClassWithPrereq["endDate"]=c[0].endDate
+            #split the string to an array
+            dictClassWithPrereq["coursePrereq"]=c[1].prerequisite.split(',')
+
+            
+            #create dictionary to store the course details
+            dictCourse={}
+
+            #course details
+            dictCourse["courseID"]=c[1].courseID
+            dictCourse["courseName"]=c[1].courseName
+            dictCourse["courseDescription"]=c[1].courseDescription
+            dictCourse["subjectcategory"]=c[1].subjectcategory
+            dictCourse["prerequisite"]=c[1].prerequisite.split(',')
+
+            #add the details to course in class details
+            dictClassWithPrereq["course"]=dictCourse
+
+            #add the class details to the class list
+            classesWithPrereq.append(dictClassWithPrereq)
+            
+        return classesWithPrereq
+
 
 class Application(db.Model):
     __tablename__ = 'application'
@@ -328,7 +476,6 @@ class ApplicationPeriod(db.Model):
             'enrolmentStartDate': self.enrolmentStartDate,
             'enrolmentEndDate': self.enrolmentEndDate,
         }
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

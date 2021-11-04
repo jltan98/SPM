@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>View Learners - Admmin</title>
+    <title>View Classes - Admin</title>
 
     <!-- Required meta tags -->
     <meta charset="UTF-8">
@@ -72,16 +72,16 @@
     <div id="main-container" class="container">
         <modal v-if="showModal" v-model="classID" @close="showModal = false">
             <template v-slot:header>
-                <h1 class="title display-6">Eligible Class</h1>
+                <h1 class="title display-6">Class</h1>
             </template>
 	    <template v-slot:body>
           <table>
             <tr>
                 <td>
-                    Learner:
+                    Class:
                 </td>
                 <td>
-                    {{currentLearner.learnerName}}
+                    {{currentClass.classID}}
                 </td>
             </tr>
             <tr>
@@ -89,7 +89,7 @@
 				Class ID:
 			</td>
 			<td>
-				{{eligibleClass.class.classID}}
+				{{currentClass.class.classID}}
 			</td>
 		</tr>
 		<tr>
@@ -97,7 +97,7 @@
 				Course Name:
 			</td>
 			<td>
-				{{eligibleClass.class.course.courseName}}
+				{{currentClass.class.course.courseName}}
 			</td>
 		</tr>
 		<tr>
@@ -105,7 +105,7 @@
 				Start Date:
 			</td>
 			<td>
-				{{eligibleClass.class.startDate}}
+				{{currentClass.class.startDate}}
 			</td>
 		</tr>
 		<tr>
@@ -113,7 +113,7 @@
 				End Date:
 			</td>
 			<td>
-				{{eligibleClass.class.endDate}}
+				{{currentClass.class.endDate}}
 			</td>
 		</tr>
 		<tr>
@@ -121,7 +121,7 @@
 				No of Slots:
 			</td>
 			<td>
-				{{eligibleClass.class.noOfSlots}}
+				{{currentClass.class.noOfSlots}}
 			</td>
 		</tr>
 		<tr>
@@ -129,13 +129,13 @@
 				Enrolment Period:
 			</td>
 			<td>
-				{{eligibleClass.class.enrolmentPeriodID}}
+				{{currentClass.class.enrolmentPeriodID}}
 			</td>
 		</tr>
 	    </table>
         </template>
         <template v-slot:footer>
-            <input type="button" @click="assignToClass()" value="Assign learner to class"></input>
+            <input type="button" @click="assignToClass()" value="Assign trainer to class"></input>
             <input type="button" @click="cancelModal()" value="Cancel"></input>
         </template>
 	</modal>
@@ -151,53 +151,36 @@
             </ul>
         </div>
 
-        <h1 class="title display-6">View Learners</h1>
+        <h1 class="title display-6">View Classes</h1>
 
         <input class="form-control" id="search" type="text" placeholder="Search..">
         <table id="appTable" class='table table-bordered'>
             <thead class="thead-dark">
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Courses Taken</th>
-                    <th>Eligible Classes</th>
+                    <th>Class ID</th>
+                    <th>Course</th>
+                    <th>Slots</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Enrolment Start Date</th>
+                    <th>Enrolment End Date</th>
+                    <th>Assigned Trainer</th>
                 </tr>
             </thead>
             <tbody id="appDetails">
-                <tr :id="'tr'+learner.learnerID" v-for="learner in learners">    
-                    <td>{{ learner.learnerID }}</td>
-                    <td>{{ learner.learnerName }}</td>
-                    <td>{{ learner.learnerContact }}</td>
+                <tr :id="'tr'+clas.classID+'-'+clas.courseID+''+clas.enrolmentPeriodID" v-for="clas in classes">    
+                    <td>{{ clas.classID }}</td>
+                    <td>{{ clas.course.courseName }}</td>
+                    <td>{{ clas.noOfSlots }}</td>
+                    <td>{{ clas.startDate }}</td>
+                    <td>{{ clas.endDate }}</td>
+                    <td></td>
+                    <td></td>
                     <td>
-                            <div v-for="course in learner.coursesTaken">
-                                <div>
-                                    <span>
-                                        {{course.courseName}}
-                                        <!-- <a href="#/" @click="selectCourseTaken(course.courseID)">
-                                        
-                                        </a> -->
-                                    </span>
-                                </div>
-                            </div>                        
+                            <input type="search" value="{{clas.trainer}}">Trainer<input>                   
                     </td>
-                    <td>
-                            <div v-for="eligibleClass in learner.eligibleClasses"> 
-                                <div>
-                                    <span v-if="eligibleClass.inprogress">
-                                        {{eligibleClass.class.classID + " - "  + eligibleClass.class.course.courseName + " (" + eligibleClass.class.enrolmentPeriodID + ")" }}
-                                    </span>
-                                    <span v-else>
-                                        <a id="show-modal" href="#/" @click="selectClass(learner,eligibleClass)">
-                                        {{eligibleClass.class.classID + " - "  + eligibleClass.class.course.courseName + " (" + eligibleClass.class.enrolmentPeriodID + ")"}}
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-
-                    </td><!--{ -{ learner.eligibleClasses }-}-->
                 </tr>
-                <tr v-if="learners.length==0">
+                <tr v-if="classes.length==0">
                     <td colspan="12">
                         No data found
                     </td>
@@ -217,64 +200,37 @@
         var app = new Vue({
             el: '#main-container',
             data: {
-                learners: [],
-                currentLearner:{},
+                classes: [],
+                currentClass:{},
                 adminID: "",
                 name: "",
-		        eligibleClass:"",
                 showModal:false
             },
             mounted: function () {
                 //retrieve sessionStorage
                 this.adminID = sessionStorage.getItem("learnerID");
                 this.name = sessionStorage.getItem("name");
-                this.getLearners();
+                this.getClasses();
             },
             methods: {
-                getLearners:function(){
-                    axios.get('http://localhost:5001/learnersClasses')
+                getClasses:function(){
+                    axios.get('http://localhost:5001/viewClasses')
                     .then(response => {
-                        this.learners = response.data;
-                        console.log(this.learners)
+                        this.classes = response.data;
+                        console.log(this.classes)
                     });
                 },
                 selectCourseTaken:function(classId,courseId,enrolmentPeriodId){
                     alert(classId);
                 },
-                selectClass:function(learner,eligibleClass){
-                    this.currentLearner=learner;
-                    this.eligibleClass=eligibleClass;
+                selectClass:function(clas,eligibleClass){
+                    this.currentClass=clas;
                     this.showModal=true;
                 },
                 cancelModal:function(){
                     this.showModal=false;
                 },
-                assignToClass: function () {
-                    if(!confirm("Assign " + this.currentLearner.learnerName +" to the selected class?")){
-                        return;
-                    }
-
-                    // create application
-                    axios.post('http://localhost:5001/create_applications', {
-                        applicationLearnerID:this.currentLearner.learnerID,
-                        applicationClassID:this.eligibleClass.class.classID,
-                        applicationCourseID:this.eligibleClass.class.courseID,
-                        applicationStatus:'Approve',
-                        enrolmentPeriodID:this.eligibleClass.class.enrolmentPeriodID,
-                        adminID:this.adminID
-                    })
-                        .then(response => {
-                            alert("You have successfully assigned learner");// + app.applicationCourseID + ", " + app.applicationCourseName + ", Class " + app.applicationClassID + ".")
-                            this.showModal=false;
-                            this.getLearners();
-                            //location.reload();
-                            return false;
-                        })
-                        .catch(error => {
-                            this.error = error.response.data.message
-                            alert(this.error)
-                        });
-                }
+                
             }
 
         });
