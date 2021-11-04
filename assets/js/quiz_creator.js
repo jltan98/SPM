@@ -1,12 +1,12 @@
-function get_classes(){
-    axios.get('http://localhost:5002/classes/T001', {
-    })
-        .then(response => {
-            console.log(response)
-        })
-        .catch(error => {
-            console.log(error)
-        });
-}
+function sendToCreate(){
+    quizName = document.getElementById("quizName").value
+    questions = document.getElementById("questions").value
+    course = document.getElementById("course").value
+    section = document.getElementById("section").value
 
-window.onload = get_classes()
+    sessionStorage.setItem("quizName",quizName)
+    sessionStorage.setItem("questions",questions)
+    sessionStorage.setItem("section",section)
+    sessionStorage.setItem("course",course)
+    window.location.href = "quiz_creation.html"
+}

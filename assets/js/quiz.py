@@ -101,6 +101,7 @@ def get_quiz_info(quizID):
 @app.route("/classes/<trainerID>", methods=['GET'])
 def get_classes(trainerID):
     classes = Classes.query.filter_by(trainerAssignedID=trainerID).all()
+    
 
     if classes:
             return jsonify({
