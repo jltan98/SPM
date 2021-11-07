@@ -8,7 +8,7 @@ if True:  # noqa: E402
 
 class TestLearner(unittest.TestCase):
     def setUp(self):
-        self.Learner = Learner('Alivia', 'L003', 'alivia@lms.com', 'IS110,IS213,IS111','1234')
+        self.Learner = Learner('Alivia', 'L003', 'alivia@lms.com', 'IS110,IS213,IS111', '1234')
         self.Application = Application(1, "L001", "G1", "IS212", "Processing",
                                         datetime(2021, 10, 20),
                                         'FY20/21 Session 2', "admin001")
