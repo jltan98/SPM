@@ -17,7 +17,7 @@ class TestLearner(unittest.TestCase):
         self.Learner = None
         
     def test_getLearnerCurrentAppliedCoursesAsDictionary(self):
-        learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
+        learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary(self.Application)
         expectedValue = ['IS211']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
