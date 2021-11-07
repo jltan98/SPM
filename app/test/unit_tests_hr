@@ -1,6 +1,6 @@
 import sys
 import unittest
-from datetime import date, datetime
+from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
     from src.classobj import Learner, Application
