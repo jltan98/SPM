@@ -73,17 +73,16 @@
                             <input type="checkbox" v-model="selectAll" @click="select"/>
                         </label>
                     </th>
-                    <th>Enrolment Period</th>
-                    <th>Course ID</th>
-                    <th>Course Name</th>
+                    <th>Application ID</th>
+                    <th>Learner Name</th>
                     <th>Class ID</th>
+                    <th>Course Name</th>
+                    <th>Enrolment Period</th>
                     <th>Class Start Date</th>
                     <th>Class End Date</th>
-                    <th>Trainer Name</th>
-                    <th>Trainer Contact</th>
-                    <th>Application ID</th>
                     <th>Application Submission Date</th>
                     <th>Application Status</th>
+                    <th>Admin</th>
                     <th>Approve/Reject</th>
                 </tr>
             </thead>
@@ -94,17 +93,16 @@
                             <input :id="'app'+application.applicationID" type="checkbox" :value="application.applicationID" v-model="selected" @click="selectItem(this)"/>
                         </label>
                     </td>
-                    <td>{{ application.enrolmentPeriodID }}</td>
-                    <td>{{ application.applicationCourseID }}</td>
-                    <td>{{ application.applicationCourseName }}</td>
-                    <td>{{ application.applicationClassID }}</td>
-                    <td>{{ application.classStartDate }}</td>
-                    <td>{{ application.classEndDate }}</td>
-                    <td>{{ application.applicationTrainerName }}</td>
-                    <td>{{ application.applicationTrainerContact}}</td>
                     <td>{{ application.applicationID }}</td>
+                    <td>{{ application.learner.learnerName }}</td>
+                    <td>{{ application.applicationClassID }}</td>
+                    <td>{{ application.course.courseName }}</td>
+                    <td>{{ application.enrolmentPeriodID }}</td>
+                    <td>{{ application.class.endDate }}</td>
+                    <td>{{ application.class.startDate }}</td>
                     <td>{{ application.applicationDate }}</td>
                     <td>{{ application.applicationStatus }}</td>
+                    <td>{{ application.administrator.adminName }}</td>
                     <td>
                         <table style="border:none">
                             <tr>
@@ -149,9 +147,10 @@
                 this.adminID = sessionStorage.getItem("learnerID");
                 this.name = sessionStorage.getItem("name");
 
-                axios.get('http://localhost:5001/viewapplications/processing')
+                axios.get('http://localhost:5001/viewapplications/Processing')
                     .then(response => {
-                        this.applications = response.data.data;
+                        //.data.data happened because the jsonify in python added data
+                        this.applications = response.data;
                         console.log(this.applications)
                     });
             },
@@ -163,6 +162,7 @@
 
                             //don't allow to select checkboxes that are hidden. 
                             //the parent tr is the one with display:none css so we will leverage on this
+
                             var trId = parseInt(this.applications[i].applicationID);
                             //get parent tr 
                             var el = $('#tr'+trId);

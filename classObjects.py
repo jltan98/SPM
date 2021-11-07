@@ -9,7 +9,7 @@ from enums import ApplicationStatus,ClassesStatus
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root' + \
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
                                         '@localhost:3306/lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
@@ -317,17 +317,17 @@ class Classes(db.Model):
         
     def GetClassesByStatus(classesStatus):
         if classesStatus==ClassesStatus.FUTURE:
-            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.startDate>datetime.now())
+            classes = db.session.query(Classes,Course,ApplicationPeriod).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==ApplicationPeriod.enrolmentPeriodID,Classes.startDate>datetime.now())
             return classes
         elif classesStatus==ClassesStatus.PAST:
-            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.endDate<datetime.now())
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==ApplicationPeriod.enrolmentPeriodID,Classes.endDate<datetime.now())
             return classes
         elif classesStatus==ClassesStatus.STARTED:
-            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.startDate<=datetime.now(),Classes.endDate>=datetime.now())
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==ApplicationPeriod.enrolmentPeriodID,Classes.startDate<=datetime.now(),Classes.endDate>=datetime.now())
             return classes
         else:
             #all classes past present future
-            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID)
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==ApplicationPeriod.enrolmentPeriodID)
             return classes
         
     def GetClassesJoinCoursesAsDictionary(classesStatus=ClassesStatus.ALL):
@@ -343,7 +343,7 @@ class Classes(db.Model):
             #we want dictionary so we can easily convert to json later
             dictClassWithPrereq={}
 
-            #class details. c[0] is for Classes, c[1] is for Course. In db.session.query(Classes,Course), Classes index =0, Course index=1
+            #class details. c[0] is for Classes, c[1] is for Course. In db.session.query(Classes,Course,ApplicationPriod), Classes index =0, Course index=1, ApplicationPeriod=2
             dictClassWithPrereq["classID"]=c[0].classID
             dictClassWithPrereq["courseID"]=c[0].courseID
             dictClassWithPrereq["noOfSlots"]=c[0].noOfSlots
@@ -358,7 +358,7 @@ class Classes(db.Model):
             #create dictionary to store the course details
             dictCourse={}
 
-            #course details
+            #course details. Get from [1]
             dictCourse["courseID"]=c[1].courseID
             dictCourse["courseName"]=c[1].courseName
             dictCourse["courseDescription"]=c[1].courseDescription
@@ -368,6 +368,12 @@ class Classes(db.Model):
             #add the details to course in class details
             dictClassWithPrereq["course"]=dictCourse
 
+            #create dictionary to store the EnrolmentPeriod. Get from [2]
+            dictEnrolmentPeriod={}
+            dictEnrolmentPeriod["enrolmentPeriodID"]=c[2].enrolmentPeriodID
+            dictEnrolmentPeriod["enrolmentStartDate"]=c[2].enrolmentStartDate
+            dictEnrolmentPeriod["enrolmentEndDate"]=c[2].enrolmentEndDate
+            dictClassWithPrereq["enrolmentPeriod"]=dictEnrolmentPeriod
             #add the class details to the class list
             classesWithPrereq.append(dictClassWithPrereq)
             

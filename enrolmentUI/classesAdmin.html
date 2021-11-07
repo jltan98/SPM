@@ -7,7 +7,7 @@
     <!-- Required meta tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
@@ -50,7 +50,6 @@
                   <slot name="body">
                     default body
                   </slot>
-                  <span v-model="classID"></span>
                 </div>
   
                 <div class="modal-footer">
@@ -70,72 +69,62 @@
 
 <body>
     <div id="main-container" class="container">
-        <modal v-if="showModal" v-model="classID" @close="showModal = false">
+        <modal v-if="showModal" @close="showModal = false">
             <template v-slot:header>
-                <h1 class="title display-6">Class</h1>
+                Trainers
             </template>
 	    <template v-slot:body>
           <table>
-            <tr>
-                <td>
-                    Class:
-                </td>
-                <td>
-                    {{currentClass.classID}}
-                </td>
-            </tr>
-            <tr>
-			<td>
-				Class ID:
-			</td>
-			<td>
-				{{currentClass.class.classID}}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Course Name:
-			</td>
-			<td>
-				{{currentClass.class.course.courseName}}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Start Date:
-			</td>
-			<td>
-				{{currentClass.class.startDate}}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				End Date:
-			</td>
-			<td>
-				{{currentClass.class.endDate}}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				No of Slots:
-			</td>
-			<td>
-				{{currentClass.class.noOfSlots}}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Enrolment Period:
-			</td>
-			<td>
-				{{currentClass.class.enrolmentPeriodID}}
-			</td>
-		</tr>
+              <thead>
+                <tr >
+                    <th>Trainer ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Skills</th>
+                    <th>Experience</th>
+                    <th>Courses Taught</th>
+                    <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="trainer in trainers">
+                      <td>{{trainer.trainerID}}</td>
+                      <td>{{trainer.trainerName}}</td>
+                      <td>{{trainer.trainerContact}}</td>
+                      <td>
+                        <div v-for="skill in trainer.skills">
+                            <div>
+                                <span>
+                                    {{skill}}
+                                </span>
+                            </div>
+                        </div>    
+
+                      </td>
+                      <td>
+                        <div v-for="exp in trainer.experience">
+                            <div>
+                                <span>
+                                    {{exp}}
+                                </span>
+                            </div>
+                        </div>                              
+                      </td>
+                      <td>
+                        <div v-for="course in trainer.coursesTaught">
+                            <div>
+                                <span>
+                                    {{course}}
+                                </span>
+                            </div>
+                        </div>    
+                      </td>
+                      <td><input type="button" @click="assignTrainerToClass(trainer)" value="Assign trainer to class"></input></td>
+                  </tr>
+              </tbody>
 	    </table>
         </template>
         <template v-slot:footer>
-            <input type="button" @click="assignToClass()" value="Assign trainer to class"></input>
             <input type="button" @click="cancelModal()" value="Cancel"></input>
         </template>
 	</modal>
@@ -165,6 +154,7 @@
                     <th>Enrolment Start Date</th>
                     <th>Enrolment End Date</th>
                     <th>Assigned Trainer</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="appDetails">
@@ -174,10 +164,15 @@
                     <td>{{ clas.noOfSlots }}</td>
                     <td>{{ clas.startDate }}</td>
                     <td>{{ clas.endDate }}</td>
-                    <td></td>
-                    <td></td>
+                    <td>{{ clas.enrolmentPeriod.enrolmentStartDate }}</td>
+                    <td>{{ clas.enrolmentPeriod.enrolmentEndDate }}</td>
                     <td>
-                            <input type="search" value="{{clas.trainer}}">Trainer<input>                   
+                            {{clas.trainerAssignedID}}                   
+                    </td>
+                    <td>
+                            <button class="btn btn-info" style="margin: auto;"
+                            @click="selectClass(clas)"> Assign trainer
+                        </button>
                     </td>
                 </tr>
                 <tr v-if="classes.length==0">
@@ -200,6 +195,7 @@
         var app = new Vue({
             el: '#main-container',
             data: {
+                trainers:[],
                 classes: [],
                 currentClass:{},
                 adminID: "",
@@ -215,17 +211,44 @@
             methods: {
                 getClasses:function(){
                     axios.get('http://localhost:5001/viewClasses')
-                    .then(response => {
-                        this.classes = response.data;
-                        console.log(this.classes)
-                    });
+                        .then(response => {
+                            this.classes = response.data;
+                            console.log(this.classes);
+                            this.getTrainers();
+                        });
+
                 },
-                selectCourseTaken:function(classId,courseId,enrolmentPeriodId){
-                    alert(classId);
+                getTrainers:function(){
+                    axios.get('http://localhost:5001/trainers')
+                            .then(response => {
+                                this.trainers = response.data.data;
+                                console.log(this.trainers)
+                            });
                 },
-                selectClass:function(clas,eligibleClass){
+                selectClass:function(clas){
                     this.currentClass=clas;
                     this.showModal=true;
+                },
+                assignTrainerToClass(trainer){
+                    var assign = confirm("assign " + trainer.trainerName + " to class: " + this.currentClass.classID + " : " + this.currentClass.course.courseName + " : " + this.currentClass.enrolmentPeriodID );
+                    if(assign){
+                        axios.post('http://localhost:5001/updateClassTrainer', {
+                            classID:this.currentClass.classID,
+                            courseID:this.currentClass.courseID,
+                            enrolmentPeriodID:this.currentClass.enrolmentPeriodID,
+                            trainerAssignedID:trainer.trainerID
+                    })
+                        .then(response => {
+                            alert("You have successfully assigned trainer to class");// + app.applicationCourseID + ", " + app.applicationCourseName + ", Class " + app.applicationClassID + ".")
+                            this.showModal=false;
+                            this.getClasses();
+                            return false;
+                        })
+                        .catch(error => {
+                            this.error = error.response.data.message
+                            alert(this.error)
+                        });
+                    } 
                 },
                 cancelModal:function(){
                     this.showModal=false;

@@ -1,3 +1,4 @@
+from operator import and_, or_
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query
@@ -12,8 +13,8 @@ from classObjects import ClassesStatus, Learner, Trainer, Administrator, Classes
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root' + \
-                                        '@localhost:8889/LMS'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root' + \
+                                        '@localhost:3306/LMS'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -278,9 +279,91 @@ def updateApplicationStatus():
             return jsonify({
                 "message": "Unable to commit to database."
             }), 500
+@app.route("/viewapplications/<string:status>")
+def viewapplications(status):
+    #get applications joined with Classes, Course, Learner. this will return only applications with matching data of joined classes
+    #applications will return results even if the outer joins Administrator and Application period has no matching data
+    applications = db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod) \
+            .join(Classes, \
+                and_(Application.applicationClassID==Classes.classID, \
+                and_(Application.applicationCourseID==Classes.courseID,Application.enrolmentPeriodID==Classes.enrolmentPeriodID))) \
+            .join(Course,Application.applicationCourseID==Course.courseID) \
+            .join(Learner,Application.applicationLearnerID==Learner.learnerID) \
+            .outerjoin(Administrator,Application.adminID==Administrator.adminID) \
+            .outerjoin(ApplicationPeriod,Application.enrolmentPeriodID==ApplicationPeriod.enrolmentPeriodID) \
+        .filter(Application.applicationStatus==status)
+            #.join(Classes,Application.applicationClassID==Classes.classID,isouter=true)
+    #applications = db.session.query(Application,Classes).outerjoin(Classes, and_(Application.applicationClassID==Classes.classID,and_(Application.applicationCourseID==Classes.courseID,Application.enrolmentPeriodID==Classes.enrolmentPeriodID)))
 
-@app.route("/viewApplications/<string:status>")
-def viewApplications(status):
+    #create list to store applications
+    apps=[]
+
+    #iterate applications
+    for ap in applications:
+        #create dictionary for application
+        #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), Classes=Application = 0
+        dictApplications={}
+        dictApplications["applicationID"]=ap[0].applicationID
+        dictApplications["applicationClassID"]=ap[0].applicationClassID
+        dictApplications["applicationCourseID"]=ap[0].applicationCourseID
+        dictApplications["enrolmentPeriodID"]=ap[0].enrolmentPeriodID
+        dictApplications["applicationLearnerID"]=ap[0].applicationLearnerID
+        dictApplications["applicationStatus"]=ap[0].applicationStatus
+        dictApplications["applicationDate"]=ap[0].applicationDate
+        
+        #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), Classes=1
+        dictClass={}
+        dictClass["classID"]=ap[1].classID
+        dictClass["courseID"]=ap[1].courseID
+        dictClass["noOfSlots"]=ap[1].noOfSlots
+        dictClass["trainerAssignedID"]=ap[1].trainerAssignedID
+        dictClass["startDate"]=ap[1].startDate
+        dictClass["endDate"]=ap[1].endDate
+        dictClass["enrolmentPeriodID"]=ap[1].enrolmentPeriodID
+        dictApplications["class"]=dictClass
+
+        #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), Course=2
+        dictCourse={}
+        dictCourse["courseID"] = ap[2].courseID
+        dictCourse["courseName"] = ap[2].courseName
+        dictCourse["courseDescription"] = ap[2].courseDescription
+        dictCourse["prerequisite"] = ap[2].prerequisite
+        dictCourse["noOfClasses"] = ap[2].noOfClasses
+        dictCourse["subjectcategory"] = ap[2].subjectcategory
+        dictApplications["course"]=dictCourse
+
+        #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), learner=3
+        dictLearner={}
+        dictLearner["learnerID"] = ap[3].learnerID
+        dictLearner["learnerName"] = ap[3].learnerName
+        dictLearner["learnerContact"] = ap[3].learnerContact
+        dictLearner["coursesTaken"] = ap[3].coursesTaken
+        dictApplications["learner"]=dictLearner
+
+        #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), Administrator=4
+        dictAdministrator={}
+        if "adminID" in ap:
+            dictAdministrator["adminID"] = ap[4].adminID
+            dictAdministrator["adminName"] = ap[4].adminName
+            dictAdministrator["adminContact"] = ap[4].adminContact
+        dictApplications["administrator"]=dictAdministrator       
+
+         #in db.session.query(Application,Classes,Course,Learner,Administrator,ApplicationPeriod), ApplicationPeriod=4
+        dictEnrolmentPeriod={}
+        dictEnrolmentPeriod["enrolmentPeriodID"]=ap[5].enrolmentPeriodID
+        dictEnrolmentPeriod["enrolmentStartDate"]=ap[5].enrolmentStartDate
+        dictEnrolmentPeriod["enrolmentEndDate"]=ap[5].enrolmentEndDate
+        dictApplications["enrolmentPeriod"]=dictEnrolmentPeriod
+        apps.append(dictApplications)
+
+    try:
+        return jsonify(apps), 200
+    except Exception as e:
+        return jsonify({
+            "message": "Applications not found."
+        }), 404
+@app.route("/viewapplications_old/<string:status>")
+def viewapplications_old(status):
     applications = Application.query.filter_by(
         applicationStatus=status)
     combined = []
@@ -306,15 +389,6 @@ def viewApplications(status):
         return jsonify({
             "message": "Applications not found."
         }), 404
-
-    # if len(combined) > 0:
-    #     return jsonify({
-    #         "data": combined
-    #     }), 200
-    # else:
-    #     return jsonify({
-    #         "message": "Applications not found."
-    #     }), 404
 
 @app.route("/approveApplications", methods=['POST', 'PUT'])
 def approveApplications():
@@ -371,7 +445,6 @@ def learnersClasses():
 
     #return the list of learner after it is converted to json
     return jsonify(learnersWithEligibleClasses), 200
-
 @app.route("/viewClasses")
 def viewClasses():
     classes = Classes.GetClassesJoinCoursesAsDictionary(ClassesStatus.FUTURE)
@@ -381,6 +454,25 @@ def viewClasses():
         return jsonify({
             "message": "Classes not found."
         }), 404
+
+@app.route("/updateClassTrainer", methods=['POST', 'PUT'])
+def updateClassTrainer():
+    data = request.get_json()
+    classID = data['classID']
+    courseID = data['courseID']
+    enrolmentPeriodID = data['enrolmentPeriodID']
+    trainerAssignedID=data['trainerAssignedID']
+    clas = Classes.query.filter(Classes.classID==classID,Classes.courseID==courseID,Classes.enrolmentPeriodID==enrolmentPeriodID).first()
+    if clas:
+        try:
+            clas.trainerAssignedID = trainerAssignedID
+            db.session.merge(clas)
+            db.session.commit()
+            return jsonify(clas.json()), 201
+        except Exception as e:
+            return jsonify({
+                "message": "Unable to commit to database."
+            }), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
