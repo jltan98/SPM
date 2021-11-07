@@ -104,16 +104,16 @@ class Learner(db.Model):
                     coursesTaken.append(dictCourseTaken)
         return coursesTaken
 
-    def getLearnerCurrentAppliedCoursesAsDictionary(self):
+    def getLearnerCurrentAppliedCoursesAsDictionary(self, application):
         # create list of learner applied courses
         learnerCurrentAppliedCourses = []
 
         # get all outstanding applications by learner
         # (status != successful and unsuccessful)
-        learnerOutstandingApplications = Application.query.filter(
-            Application.applicationLearnerID == self.learnerID,
-            Application.applicationStatus != 'Successful',
-            Application.applicationStatus != 'Unsuccessful')
+        learnerOutstandingApplications = application.query.filter(
+            application.applicationLearnerID == self.learnerID,
+            application.applicationStatus != 'Successful',
+            application.applicationStatus != 'Unsuccessful')
 
         # iterate learners current applications
         for learnerApplication in learnerOutstandingApplications:
