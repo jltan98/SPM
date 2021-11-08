@@ -18,7 +18,7 @@ CORS(app)
 class Quizzes(db.Model):
     __tablename__ = 'quizzes'
     quizID = db.Column(db.Integer, primary_key=True)
-    classID = db.Column(db.String(5), primary_key=True)
+    classID = db.Column(db.String(5))
     sectionID = db.Column(db.String(10))
     active = db.Column(db.Boolean)
 
@@ -26,7 +26,7 @@ class Quizzes(db.Model):
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
     quizInfoID = db.Column(db.Integer, db.ForeignKey(
-        'quizzes.(quizID, classID)'), primary_key=True)
+        'quizzes.quizID'), primary_key=True)
     questionNumber = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
