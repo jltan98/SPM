@@ -42,7 +42,7 @@ class TestLearner(TestApp):
         # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
         learnerCurrentAppliedCourses = json.loads(response.data)
         print(learnerCurrentAppliedCourses)
-        expectedValue = ['IS211']
+        expectedValue = ['IS212']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
 
