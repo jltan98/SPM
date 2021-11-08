@@ -31,7 +31,7 @@ class TestLearner(unittest.TestCase):
                                   datetime(2021, 10, 20),
                                   'FY20/21 Session 2', "admin001")
         db.session.add(learner)
-        db.session.add(application)
+        # db.session.add(application)
         db.session.commit()
 
         response = self.client.get("/learnerCurrAppliedCourse/" + learner.learnerID)

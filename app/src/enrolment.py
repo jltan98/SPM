@@ -480,14 +480,14 @@ def updateClassTrainer():
 def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
     # create list of learner applied courses
     learnerCurrentAppliedCourses = []
-    print("PASS")
+
     # get all outstanding applications by learner
     # (status != successful and unsuccessful)
     learnerOutstandingApplications = Application.query.filter(
         Application.applicationLearnerID == learnerID,
         Application.applicationStatus != 'Successful',
         Application.applicationStatus != 'Unsuccessful')
-    print("PASS")
+
     # iterate learners current applications
     for learnerApplication in learnerOutstandingApplications:
         learnerCurrentAppliedCourses.append(
