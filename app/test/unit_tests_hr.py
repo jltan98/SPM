@@ -5,11 +5,8 @@ import json
 from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
-    from src.classobj import Learner, Trainer, Administrator
-    from src.classobj import Classes, Course, Application, enrolmentPeriod
-    from src.classobj import db
+    from src.classobj import db, Learner, Application
     from src.enrolment import app
-    from src.classobj import Classes, Course, Application, enrolmentPeriod
 
 
 class TestApp(flask_testing.TestCase):
@@ -39,7 +36,6 @@ class TestLearner(TestApp):
         db.session.commit()
 
         response = self.client.get("/learnerCurrAppliedCourse/" + learner.learnerID)
-        # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
         learnerCurrentAppliedCourses = json.loads(response.data)
         print(learnerCurrentAppliedCourses)
         expectedValue = ['IS212']
