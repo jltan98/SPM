@@ -4,11 +4,7 @@ import flask_testing
 from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
-    from src.classobj import Learner, Trainer, Administrator
-    from src.classobj import Classes, Course, Application, enrolmentPeriod
-    from src.enums import ClassesStatus
-    from src.classobj import db, app, Learner, Application
-    import src.enrolment
+    from src.enrolment import db, app, Learner, Application
 
 
 class TestApp(flask_testing.TestCase):
