@@ -25,19 +25,14 @@ class Quizzes(db.Model):
 
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
-    quizID = db.Column(db.Integer, primary_key=True)
-    classID = db.Column(db.String(5), primary_key=True)
-    questionNumber = db.Column(db.Integer)
+    quizID = db.Column(db.Integer, db.ForeignKey(
+        'quizzes.quizID'))
+    classID = db.Column(db.String(5), db.ForeignKey(
+        'quizzes.classID'))
+    questionNumber = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
-
-    __table_args__ = (
-        db.ForeignKeyConstraint(
-            ['quizID', 'classID'],
-            ['quizzes.quizID', 'quizzes.classID'],
-        ),
-    )
 
 
 @app.route("/enter_quiz", methods=['POST'])
