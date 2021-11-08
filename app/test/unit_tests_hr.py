@@ -7,7 +7,6 @@ if True:  # noqa: E402
     from src.classobj import db, app, Learner, Trainer, Administrator
     from src.classobj import Classes, Course, Application, enrolmentPeriod
     from src.enums import ClassesStatus
-    import src.enrolment
 
 
 class TestApp(flask_testing.TestCase):

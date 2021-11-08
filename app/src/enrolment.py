@@ -476,24 +476,5 @@ def updateClassTrainer():
             }), 500
 
 
-@app.route("/learnerCurrAppliedCourse/<string:learnerID>")
-def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
-    # create list of learner applied courses
-    learnerCurrentAppliedCourses = []
-
-    # get all outstanding applications by learner
-    # (status != successful and unsuccessful)
-    learnerOutstandingApplications = Application.query.filter(
-        Application.applicationLearnerID == learnerID,
-        Application.applicationStatus != 'Successful',
-        Application.applicationStatus != 'Unsuccessful')
-
-    # iterate learners current applications
-    for learnerApplication in learnerOutstandingApplications:
-        learnerCurrentAppliedCourses.append(
-            learnerApplication.applicationCourseID)
-    return learnerCurrentAppliedCourses
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
