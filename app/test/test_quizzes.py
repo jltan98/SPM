@@ -24,16 +24,16 @@ class TestApp(flask_testing.TestCase):
 
 class TestQuizzes(TestApp):
     def test_create_quiz(self):
-        q = Quizzes(quizID = "2", 
-                    classID = 'IS111', 
-                    sectionID = 'G6', 
+        q = Quizzes(quizID="2", 
+                    classID='IS111', 
+                    sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizID = "2", 
-                      questionNumber = 1,
+        qi = QuizInfo(quizID="2", 
+                      questionNumber=1,
                       answer='Chicken', 
-                      question = "What came first?", 
-                      selections = {
+                      question="What came first?", 
+                      selections={
                                     "selection": [
                                         "chicken",
                                         "egg",
