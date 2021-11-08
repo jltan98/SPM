@@ -1,3 +1,4 @@
+from enum import unique
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -29,7 +30,7 @@ class QuizInfo(db.Model):
         'quizzes.quizID'))
     classID = db.Column(db.String(5), db.ForeignKey(
         'quizzes.classID'))
-    questionNumber = db.Column(db.Integer, primary_key=True)
+    questionNumber = db.Column(db.Integer, unique, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
