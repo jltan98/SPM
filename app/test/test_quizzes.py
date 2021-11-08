@@ -29,7 +29,8 @@ class TestQuizzes(TestApp):
                     sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizInfoID="2", 
+        qi = QuizInfo(quizInfoID="2",
+                      quizClassID='IS111', 
                       questionNumber=1,
                       answer='Chicken', 
                       question="What came first?", 
