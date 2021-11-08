@@ -54,7 +54,7 @@ def register():
     )
 
     quizInfo = QuizInfo(
-        quizInfoID=data['quizInfoID'],
+        quizInfoID=data['quizID'],
         questionNumber=data['questionNumber'],
         question=data['question'],
         answer=data['answer'],
