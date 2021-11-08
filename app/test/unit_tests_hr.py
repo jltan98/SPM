@@ -26,11 +26,11 @@ class TestApp(flask_testing.TestCase):
 class TestLearner(unittest.TestCase):
     def test_getLearnerCurrentAppliedCoursesAsDictionary(self):
         learner = Learner(learnerName='Alivia', learnerID='L003', learnerContact='alivia@lms.com', coursesTaken='IS110,IS213,IS111', password='1234')
-        application = Application(applicationID=1, applicationLearnerID="L001", applicationClassID="G1", applicationCourseID="IS212", applicationStatus="Processing",
-                                  applicationDate=datetime(2021, 10, 20),
-                                  enrolmentPeriodID='FY20/21 Session 2', adminID="admin001")
+        # application = Application(applicationID=1, applicationLearnerID="L001", applicationClassID="G1", applicationCourseID="IS212", applicationStatus="Processing",
+        #                           applicationDate=datetime(2021, 10, 20),
+        #                           enrolmentPeriodID='FY20/21 Session 2', adminID="admin001")
         db.session.add(learner)
-        db.session.add(application)
+        # db.session.add(application)
         db.session.commit()
 
         response = self.client.get("/learnerCurrAppliedCourse/" + learner.learnerID)
