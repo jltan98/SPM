@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from operator import and_
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -492,7 +493,7 @@ def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
     for learnerApplication in learnerOutstandingApplications:
         learnerCurrentAppliedCourses.append(
             learnerApplication.applicationCourseID)
-    return learnerCurrentAppliedCourses
+    return json.dumps(learnerCurrentAppliedCourses)
 
 
 if __name__ == '__main__':

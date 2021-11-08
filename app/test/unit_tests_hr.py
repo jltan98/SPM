@@ -1,6 +1,7 @@
 import sys
 import unittest
 import flask_testing
+import json
 from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
@@ -39,7 +40,7 @@ class TestLearner(TestApp):
 
         response = self.client.get("/learnerCurrAppliedCourse/" + learner.learnerID)
         # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
-        learnerCurrentAppliedCourses = response.data
+        learnerCurrentAppliedCourses = json.loads(response.data)
         print(learnerCurrentAppliedCourses)
         expectedValue = ['IS211']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
