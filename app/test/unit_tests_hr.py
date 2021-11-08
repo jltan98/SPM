@@ -41,6 +41,9 @@ class TestLearner(unittest.TestCase):
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
     def test_getCoursesTakenIDs(self):
+        self.learner = Learner('Alivia', 'L003', 'alivia@lms.com',
+                          'IS110,IS213,IS111', '1234')
+
         learnerCoursesTaken = self.Learner.getCoursesTakenIDs()
         expectedValue = ['IS110', 'IS213', 'IS111']
         self.assertEqual(expectedValue, learnerCoursesTaken)
