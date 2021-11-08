@@ -6,7 +6,8 @@ sys.path.append('./app')
 if True:  # noqa: E402
     from src.classobj import Learner, Trainer, Administrator
     from src.classobj import Classes, Course, Application, enrolmentPeriod
-    from src.enrolment import db, app
+    from src.classobj import db
+    from src.enrolment import app
     from src.classobj import Classes, Course, Application, enrolmentPeriod
 
 
