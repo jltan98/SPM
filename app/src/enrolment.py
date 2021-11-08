@@ -486,8 +486,7 @@ def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
     # (status != successful and unsuccessful)
     learnerOutstandingApplications = Application.query.filter(
         Application.applicationLearnerID == learnerID,
-        Application.applicationStatus != 'Successful',
-        Application.applicationStatus != 'Unsuccessful')
+        Application.applicationStatus == 'Processing')
 
     # iterate learners current applications
     for learnerApplication in learnerOutstandingApplications:
