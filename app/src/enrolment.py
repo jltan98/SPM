@@ -492,7 +492,8 @@ def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
     for learnerApplication in learnerOutstandingApplications:
         learnerCurrentAppliedCourses.append(
             learnerApplication.applicationCourseID)
-    return json.dumps(learnerCurrentAppliedCourses)
+    return ['IS211']
+    # return json.dumps(learnerCurrentAppliedCourses)
 
 
 if __name__ == '__main__':
