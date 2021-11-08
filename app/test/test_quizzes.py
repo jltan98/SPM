@@ -2,12 +2,13 @@ import unittest
 import flask_testing
 import json
 import sys
+import os
 sys.path.append('./app')
 if True:  # noqa: E402
     from src.quizzes import app, db, Quizzes, QuizInfo
 
 class TestApp(flask_testing.TestCase):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
     app.config['TESTING'] = True
 
