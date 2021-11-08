@@ -30,7 +30,8 @@ class TestQuizzes(TestApp):
                     sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizInfoID=1,
+        qi = QuizInfo(quizID=2,
+                      classID='IS111',
                       questionNumber=1,
                       answer='Chicken', 
                       question="What came first?", 
@@ -50,7 +51,6 @@ class TestQuizzes(TestApp):
             'classID': q.classID,
             'sectionID': q.sectionID,
             'active': q.active,
-            'quizInfoID': qi.quizInfoID,
             'answer':qi.answer,
             'questionNumber': qi.questionNumber,
             'question': qi.question,
@@ -65,7 +65,6 @@ class TestQuizzes(TestApp):
             'classID': "IS111",
             'sectionID': "G6",
             'active': 1,
-            'quizInfoID': 1,
             'questionNumber': 1,
             'question': "What came first?",
             'selections' :{

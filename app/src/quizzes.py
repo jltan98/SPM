@@ -25,19 +25,26 @@ class Quizzes(db.Model):
 
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
-    quizInfoID = db.Column(db.Integer, primary_key=True)
+    quizID = db.Column(db.Integer, primary_key=True)
+    classID = db.Column(db.String(5), primary_key=True)
     questionNumber = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
 
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['quizID', 'classID'],
+            ['quizzes.quizID', 'quizzes.classID'],
+        ),
+    )
 
 @app.route("/enter_quiz", methods=['POST'])
 def register():
     data = request.get_json()
     if not all(key in data.keys() for
                key in ('quizID', 'classID', 'sectionID', 'active',
-                       'quizInfoID', 'questionNumber', 'question',
+                       'questionNumber', 'question',
                        'answer', 'selections')):
         return jsonify({
             "message": "Incorrect JSON object provided."
@@ -53,7 +60,8 @@ def register():
     )
 
     quizInfo = QuizInfo(
-        quizInfoID=data['quizInfoID'],
+        quizID=data['quizID'],
+        classID=data['classID'],
         questionNumber=data['questionNumber'],
         question=data['question'],
         answer=data['answer'],
