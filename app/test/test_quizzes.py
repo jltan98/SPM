@@ -30,19 +30,19 @@ class TestQuizzes(TestApp):
                     sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizInfoID=2,
-                      questionNumber=1,
-                      answer='Chicken', 
-                      question="What came first?", 
-                      selections={
-                                    "selection": [
-                                        "chicken",
-                                        "egg",
-                                        "hen",
-                                        "rooster"
-                                    ]})
+        # qi = QuizInfo(quizInfoID=1,
+        #               questionNumber=1,
+        #               answer='Chicken', 
+        #               question="What came first?", 
+        #               selections={
+        #                             "selection": [
+        #                                 "chicken",
+        #                                 "egg",
+        #                                 "hen",
+        #                                 "rooster"
+        #                             ]})
         db.session.add(q)
-        db.session.add(qi)
+        # db.session.add(qi)
         db.session.commit()
 
         request_body = {
