@@ -36,7 +36,7 @@ class QuizInfo(db.Model):
 def register():
     data = request.get_json()
     if not all(key in data.keys() for
-               key in ('quizID', 'classID', 'sectionID', 'active', 
+               key in ('quizID', 'classID', 'sectionID', 'active',
                        'questionNumber', 'question',
                        'answer', 'selections')):
         return jsonify({
@@ -46,7 +46,7 @@ def register():
     print(data['quizID'])
 
     quiz = Quizzes(
-        quizID=data['quizID'], 
+        quizID=data['quizID'],
         classID=data['classID'],
         sectionID=data['sectionID'],
         active=data['active']
