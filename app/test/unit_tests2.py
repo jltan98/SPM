@@ -8,8 +8,6 @@ import sys
 sys.path.append('./app')
 if True:  # noqa: E402
     from src.classobj import Learner, Trainer, Administrator, Classes, Course, Application, enrolmentPeriod
-    from src.enrolment import AddMe, learnersClasses, viewapplications
-    from src.enums import ClassesStatus
 
 class TestLearner(unittest.TestCase):
     def setUp(self):
