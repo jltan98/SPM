@@ -27,7 +27,7 @@ class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
     quizID = db.Column(db.Integer, primary_key=True)
     classID = db.Column(db.String(5), primary_key=True)
-    questionNumber = db.Column(db.Integer, primary_key=True)
+    questionNumber = db.Column(db.Integer)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
