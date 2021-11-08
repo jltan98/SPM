@@ -4,9 +4,12 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
 from datetime import date, datetime
-from classObjects import Learner, Trainer, Administrator, Classes, Course, Application, ApplicationPeriod
-from enrolment import AddMe, learnersClasses, viewapplications
-from enums import ClassesStatus
+import sys
+sys.path.append('./app')
+if True:  # noqa: E402
+    from src.classobj import Learner, Trainer, Administrator, Classes, Course, Application, enrolmentPeriod
+    from src.enrolment import AddMe, learnersClasses, viewapplications
+    from src.enums import ClassesStatus
 
 class TestLearner(unittest.TestCase):
     def setUp(self):
