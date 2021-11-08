@@ -15,7 +15,6 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        db.drop_all()
         db.create_all()
 
     def tearDown(self):
