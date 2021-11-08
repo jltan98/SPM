@@ -476,7 +476,7 @@ def updateClassTrainer():
             }), 500
 
 
-@app.route("/learner_currAppliedCourses/<string: learnerID>")
+@app.route("/learnerCurrAppliedCourse/<string:learnerID>")
 def getLearnerCurrentAppliedCoursesAsDictionary(learnerID):
     # create list of learner applied courses
     learnerCurrentAppliedCourses = []
