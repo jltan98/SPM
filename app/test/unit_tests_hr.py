@@ -25,7 +25,7 @@ class TestApp(flask_testing.TestCase):
         db.drop_all()
 
 
-class TestLearner(unittest.TestCase):
+class TestLearner(TestApp):
     def test_getLearnerCurrentAppliedCoursesAsDictionary(self):
         learner = Learner(learnerName='Alivia', learnerID='L003', learnerContact='alivia@lms.com', coursesTaken='IS110,IS213,IS111', password='1234')
         application = Application(applicationID=1, applicationLearnerID="L001", applicationClassID="G1", applicationCourseID="IS212", applicationStatus="Processing",
@@ -42,6 +42,8 @@ class TestLearner(unittest.TestCase):
         expectedValue = ['IS211']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
+
+class TestCoursesTaken(unittest.TestCase):
     def test_getCoursesTakenIDs(self):
         self.learner = Learner('Alivia', 'L003', 'alivia@lms.com',
                           'IS110,IS213,IS111', '1234')
