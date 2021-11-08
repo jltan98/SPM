@@ -1,23 +1,42 @@
 import sys
 import unittest
+import flask_testing
 from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
-    from src.classobj import Learner, Application
+    from src.classobj import db, app, Learner, Application
+
+
+class TestApp(flask_testing.TestCase):
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
+    app.config['TESTING'] = True
+
+    def create_app(self):
+        return app
+
+    def setUp(self):
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
 
 class TestLearner(unittest.TestCase):
-    def setUp(self):
-        self.Learner = Learner('Alivia', 'L003', 'alivia@lms.com', 'IS110,IS213,IS111', '1234')
-        self.Application = Application(1, "L001", "G1", "IS212", "Processing",
-                                        datetime(2021, 10, 20),
-                                        'FY20/21 Session 2', "admin001")
-    def tearDown(self):
-        self.Application = None
-        self.Learner = None
-        
     def test_getLearnerCurrentAppliedCoursesAsDictionary(self):
-        learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary(self.Application)
+        learner = Learner('Alivia', 'L003', 'alivia@lms.com',
+                          'IS110,IS213,IS111', '1234')
+        application = Application(1, "L001", "G1", "IS212", "Processing",
+                                  datetime(2021, 10, 20),
+                                  'FY20/21 Session 2', "admin001")
+        db.session.add(learner)
+        db.session.add(application)
+        db.session.commit()
+
+        response = self.client.get("/learner_currAppliedCourses")
+        # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
+        learnerCurrentAppliedCourses = response.data
         expectedValue = ['IS211']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
