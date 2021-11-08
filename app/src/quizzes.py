@@ -25,7 +25,8 @@ class Quizzes(db.Model):
 
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
-    quizInfoID = db.Column(db.Integer, primary_key=True)
+    quizInfoID = db.Column(db.Integer, db.ForeignKey(
+        'quizzes.quizID'), primary_key=True)
     questionNumber = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
@@ -53,7 +54,7 @@ def register():
     )
 
     quizInfo = QuizInfo(
-        quizID=data['quizID'],
+        quizInfoID=data['quizInfoID'],
         questionNumber=data['questionNumber'],
         question=data['question'],
         answer=data['answer'],

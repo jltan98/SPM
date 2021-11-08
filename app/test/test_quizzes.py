@@ -59,7 +59,7 @@ class TestQuizzes(TestApp):
                                     data=json.dumps(request_body),
                                     content_type='application/json')
         self.assertEqual(response.json, {
-            'quizID': 2,
+            'quizInfoID': 2,
             'classID': "IS111",
             'sectionID': "G6",
             'active': 1,
