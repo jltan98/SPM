@@ -8,7 +8,7 @@ if True:  # noqa: E402
     from src.quizzes import app, db, Quizzes, QuizInfo
 
 class TestApp(flask_testing.TestCase):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
     app.config['TESTING'] = True
 
@@ -25,13 +25,12 @@ class TestApp(flask_testing.TestCase):
 
 class TestQuizzes(TestApp):
     def test_create_quiz(self):
-        q = Quizzes(quizID="2", 
+        q = Quizzes(quizID=2, 
                     classID='IS111', 
                     sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizInfoID="2",
-                      quizClassID='IS111', 
+        qi = QuizInfo(quizInfoID=2,
                       questionNumber=1,
                       answer='Chicken', 
                       question="What came first?", 
@@ -51,6 +50,7 @@ class TestQuizzes(TestApp):
             'classID': q.classID,
             'sectionID': q.sectionID,
             'active': q.active,
+            'quizInfoID': qi.quizInfoID,
             'answer':qi.answer,
             'questionNumber': qi.questionNumber,
             'question': qi.question,
@@ -65,6 +65,7 @@ class TestQuizzes(TestApp):
             'classID': "IS111",
             'sectionID': "G6",
             'active': 1,
+            'quizInfoID': 2,
             'questionNumber': 1,
             'question': "What came first?",
             'selections' :{
