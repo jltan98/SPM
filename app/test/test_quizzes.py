@@ -49,7 +49,7 @@ class TestQuizzes(TestApp):
             'classID': q.classID,
             'sectionID': q.sectionID,
             'active': q.active,
-            'answer':qi.answer,
+            'answer': qi.answer,
             'questionNumber': qi.questionNumber,
             'question': qi.question,
             'selections': qi.selections,
