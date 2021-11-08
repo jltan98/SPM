@@ -37,6 +37,7 @@ class TestLearner(unittest.TestCase):
         response = self.client.get("/learner_currAppliedCourses")
         # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
         learnerCurrentAppliedCourses = response.data
+        print(learnerCurrentAppliedCourses)
         expectedValue = ['IS211']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
@@ -44,7 +45,7 @@ class TestLearner(unittest.TestCase):
         self.learner = Learner('Alivia', 'L003', 'alivia@lms.com',
                           'IS110,IS213,IS111', '1234')
 
-        learnerCoursesTaken = self.Learner.getCoursesTakenIDs()
+        learnerCoursesTaken = self.learner.getCoursesTakenIDs()
         expectedValue = ['IS110', 'IS213', 'IS111']
         self.assertEqual(expectedValue, learnerCoursesTaken)
 
