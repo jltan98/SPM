@@ -34,7 +34,7 @@ class TestLearner(unittest.TestCase):
         db.session.add(application)
         db.session.commit()
 
-        response = self.client.get("/learner_currAppliedCourses")
+        response = self.client.get("/learner_currAppliedCourses/" + learner.learnerID)
         # learnerCurrentAppliedCourses = self.Learner.getLearnerCurrentAppliedCoursesAsDictionary()
         learnerCurrentAppliedCourses = response.data
         print(learnerCurrentAppliedCourses)
