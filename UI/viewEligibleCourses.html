@@ -25,23 +25,23 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        .title,
-        #search {
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-    </style>
 </head>
 
 <body>
 
+               <!-- NAVBAR ALL ADMIN PAGES -->
     <div id="main-container" class="container">
-
         <div class="bs-example">
             <ul class="nav nav-tabs mt-3">
+
                 <li class="nav-item">
-                    <a href="" class="nav-link active">Home</a>
+                    <a href="./viewEligibleCourses.html" class="nav-link active">Courses Available</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./viewTrainers.html" class="nav-link">Trainers Available</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./application.html" class="nav-link">Your Applications</a>
                 </li>
                 <li class="nav-item ml-auto">
                     <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
@@ -50,9 +50,14 @@
             </ul>
         </div>
 
-        <h1 class="title display-6">View Eligible Courses</h1>
+    <br>
+    <h2 class="title display-6">View Eligible Courses</h2>
+    <br>
+
+       <!-- NAVBAR ALL ADMIN PAGES -->
 
         <input class="form-control" id="search" type="text" placeholder="Search..">
+        <br>
 
         <table id="eligibleCourseTable" class='table table-bordered'>
             <thead class="thead-dark">
@@ -111,7 +116,7 @@
                 this.learnerID = sessionStorage.getItem("learnerID");
                 this.name = sessionStorage.getItem("name");
 
-                axios.get('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/viewEligibleCourses/' + this.learnerID)
+                axios.get('http://localhost:5001/viewEligibleCourses/' + this.learnerID)
                     .then(response => {
                         this.eligibleclasses = response.data.data;
                         for (i = 0; i < this.eligibleclasses.length; i++) {

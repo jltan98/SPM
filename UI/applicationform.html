@@ -112,8 +112,8 @@
                 this.applicationClassID = sessionStorage.getItem("appClassID");
                 this.learnerID = sessionStorage.getItem("learnerID");
 
-                let classURL = "http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/" + this.applicationCourseID + "/" + this.applicationClassID
-                let learnerURL = "http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/learners/" + this.learnerID
+                let classURL = "http://localhost:5001/" + this.applicationCourseID + "/" + this.applicationClassID
+                let learnerURL = "http://localhost:5001/learners/" + this.learnerID
 
                 // console.log(url)
                 axios.all([
@@ -125,7 +125,7 @@
                         this.learnerDetails = obj2.data.data;
                         this.trainerID = this.classDetails.trainerAssignedID
                         this.enrolmentPeriodID = this.classDetails.enrolmentPeriodID
-                        let url2 = "http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/trainers" + "/" + this.trainerID
+                        let url2 = "http://localhost:5001/trainers" + "/" + this.trainerID
                         axios.get(url2)
                             .then(response => {
                                 this.trainerDetails = response.data.data;
@@ -136,7 +136,7 @@
                 submit: function () {
                     event.preventDefault();
                     // add commit to database for application form
-                    axios.post('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/create_applications', {
+                    axios.post('http://localhost:5001/create_applications', {
                         applicationLearnerID: this.learnerID,
                         applicationClassID: this.applicationClassID,
                         applicationCourseID: this.applicationCourseID,

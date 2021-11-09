@@ -25,13 +25,8 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        .title,
-        #search {
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-    </style>
+
+
     <!-- template for the modal component -->
     <script type="text/x-template" id="modal-template">
         <transition name="modal">
@@ -128,10 +123,21 @@
             <input type="button" @click="cancelModal()" value="Cancel"></input>
         </template>
 	</modal>
+
+
+            <!-- NAVBAR ALL ADMIN PAGES -->
+    <div id="main-container" class="container">
         <div class="bs-example">
             <ul class="nav nav-tabs mt-3">
+
                 <li class="nav-item">
-                    <a href="#" class="nav-link active">Home</a>
+                    <a href="./applicationAdmin.html" class="nav-link">Applications</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./learnersAdmin.html" class="nav-link">Learners</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./classesAdmin.html" class="nav-link active">Trainers</a>
                 </li>
                 <li class="nav-item ml-auto">
                     <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
@@ -139,10 +145,15 @@
                 </li>
             </ul>
         </div>
+    <!-- NAVBAR ALL ADMIN PAGES -->
 
-        <h1 class="title display-6">View Classes</h1>
+    <br>
+    <h2 class="title display-6">Manage Classes</h2>
+    <br>
 
         <input class="form-control" id="search" type="text" placeholder="Search..">
+    <br>
+
         <table id="appTable" class='table table-bordered'>
             <thead class="thead-dark">
                 <tr>

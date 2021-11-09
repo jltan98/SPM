@@ -140,7 +140,7 @@
                         alert("Please fill in all fields before proceeding.")
                     } else {
                         let password = SHA1(document.getElementById("password").value)
-                        axios.post('http://ec2-44-196-228-15.compute-1.amazonaws.com:5002/login', {
+                        axios.post('http://localhost:5002/login', {
                             userid: this.userid,
                             password: password,
                             role: this.role

@@ -25,21 +25,23 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        .title,
-        #search {
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-    </style>
 </head>
 
 <body>
+
+    <!-- NAVBAR ALL ADMIN PAGES -->
     <div id="main-container" class="container">
         <div class="bs-example">
             <ul class="nav nav-tabs mt-3">
+
                 <li class="nav-item">
-                    <a href="#" class="nav-link active">Home</a>
+                    <a href="./applicationAdmin.html" class="nav-link active">Applications</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./learnersAdmin.html" class="nav-link">Learners</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./classesAdmin.html" class="nav-link">Trainers</a>
                 </li>
                 <li class="nav-item ml-auto">
                     <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
@@ -47,24 +49,27 @@
                 </li>
             </ul>
         </div>
-
-        <h1 class="title display-6">View Applications</h1>
-
-        <input class="form-control" id="search" type="text" placeholder="Search..">
+    <!-- NAVBAR ALL ADMIN PAGES -->
+        <br>
+        <h2 class="title display-6">Manage Applications</h2>
+        <br>
+        <input class="form-control" id="search" type="text" placeholder="Search...">
+        <br>
         <table>
             <tr>
                 <td>
-                    <button class="btn btn-info" style="margin: auto;" :disabled="selected.length==0"
+                    <button class="btn btn-success" style="margin: auto;" :disabled="selected.length==0"
                         @click="approval('Approve')"> Approve Selected Applications
                     </button>
                 </td> 
                 <td>
-                    <button class="btn btn-info" style="margin: auto;" :disabled="selected.length==0"
+                    <button class="btn btn-danger" style="margin: auto;" :disabled="selected.length==0"
                     @click="approval('Reject')"> Reject Selected Applications
                 </button>
                 </td>
             </tr>
-        </table>
+        </table><br>
+
         <table id="appTable" class='table table-bordered'>
             <thead class="thead-dark">
                 <tr>
@@ -82,7 +87,6 @@
                     <th>Class End Date</th>
                     <th>Application Submission Date</th>
                     <th>Application Status</th>
-                    <th>Admin</th>
                     <th>Approve/Reject</th>
                 </tr>
             </thead>
@@ -102,23 +106,17 @@
                     <td>{{ application.class.startDate }}</td>
                     <td>{{ application.applicationDate }}</td>
                     <td>{{ application.applicationStatus }}</td>
-                    <td>{{ application.administrator.adminName }}</td>
                     <td>
                         <table style="border:none">
                             <tr>
-                                <td>
-                                    <button class="btn btn-info" style="margin: auto;"
+                                    <button class="btn btn-success"
                                         @click="approveItem('Approve',application.applicationID)"> Approve
                                     </button>
-                                </td> 
-                                <td>
-                                    <button class="btn btn-info" style="margin: auto;"
+                                    <button class="btn btn-danger"
                                     @click="approveItem('Reject',application.applicationID)"> Reject
                                 </button>
-                                </td>
                             </tr>
                         </table>
-                        
                     </td>
                 </tr>
                 <tr v-if="applications.length==0">
@@ -128,9 +126,13 @@
                 </tr>
             </tbody>
         </table>
+
         <p>Should you require further assistance, please email the administrator at <a class="mailto"
                 href="mailto:hr@lms.com">hr@lms.com</a> </p>
     </div>
+
+
+
     <script>
         sessionStorage
         var app = new Vue({
