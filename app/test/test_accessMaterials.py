@@ -42,7 +42,7 @@ class testprogress(unittest.TestCase):
         self.lesson = lesson("1",
                              "First,Second,Third",
                              [True, True, False])
-    
+
     def tearDown(self):
         self.lesson = None
 
