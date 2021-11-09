@@ -35,9 +35,6 @@ class QuizInfo(db.Model):
     selections = db.Column(db.JSON)
 
 
-db.create_all()
-
-
 @app.route("/enter_quiz", methods=['POST'])
 def register():
     data = request.get_json()
