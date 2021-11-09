@@ -43,6 +43,20 @@ def learner_by_id(learnerID):
         }), 404
 
 
+@app.route("/learner/<string:name>")
+def get_course(name):
+    learner = Learner.query.filter_by(learnerName=name).first()
+
+    if learner:
+        return jsonify({
+            "data": learner.to_dict()
+        }), 200
+    else:
+        return jsonify({
+            "message": "Person not found."
+        }), 404
+        
+
 @app.route("/trainers/<string:trainerID>")
 def trainer_by_id(trainerID):
     trainer = Trainer.query.filter_by(trainerID=trainerID).first()
@@ -135,7 +149,36 @@ def classes():
         }), 404
 
 
-@app.route("/applications/<string:applicationLearnerID>")
+@app.route("/enrolDates")
+def get_enrolment_period():
+    period = enrolmentPeriod.query.all()
+
+    if period:
+        return jsonify({
+            "data": [periods.to_dict() for periods in period]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Person not found."
+        }), 404
+
+
+@app.route("/applications/<learnerID>", methods=['GET'])
+def get_applications(learnerID):
+    applications = Application.query.filter_by(
+        applicationLearnerID=learnerID).all()
+
+    if applications:
+        return jsonify({
+            "data": [application.to_dict() for application in applications]
+        }), 200
+    else:
+        return jsonify({
+            "message": "Person not found."
+        }), 404
+        
+
+@app.route("/applications_json/<string:applicationLearnerID>")
 def applicationStatus(applicationLearnerID):
     applications = Application.query.filter_by(
         applicationLearnerID=applicationLearnerID)
