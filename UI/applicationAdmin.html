@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>View Applications</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .title,
+        #search {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-container" class="container">
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
+
+        <h1 class="title display-6">View Applications</h1>
+
+        <input class="form-control" id="search" type="text" placeholder="Search..">
+        <table>
+            <tr>
+                <td>
+                    <button class="btn btn-info" style="margin: auto;" :disabled="selected.length==0"
+                        @click="approval('Approve')"> Approve Selected Applications
+                    </button>
+                </td> 
+                <td>
+                    <button class="btn btn-info" style="margin: auto;" :disabled="selected.length==0"
+                    @click="approval('Reject')"> Reject Selected Applications
+                </button>
+                </td>
+            </tr>
+        </table>
+        <table id="appTable" class='table table-bordered'>
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        <label class="form-checkbox">
+                            <input type="checkbox" v-model="selectAll" @click="select"/>
+                        </label>
+                    </th>
+                    <th>Application ID</th>
+                    <th>Learner Name</th>
+                    <th>Class ID</th>
+                    <th>Course Name</th>
+                    <th>Enrolment Period</th>
+                    <th>Class Start Date</th>
+                    <th>Class End Date</th>
+                    <th>Application Submission Date</th>
+                    <th>Application Status</th>
+                    <th>Admin</th>
+                    <th>Approve/Reject</th>
+                </tr>
+            </thead>
+            <tbody id="appDetails">
+                <tr :id="'tr'+application.applicationID" v-for="application in applications">    
+                    <td>
+                        <label class="form-checkbox">
+                            <input :id="'app'+application.applicationID" type="checkbox" :value="application.applicationID" v-model="selected" @click="selectItem(this)"/>
+                        </label>
+                    </td>
+                    <td>{{ application.applicationID }}</td>
+                    <td>{{ application.learner.learnerName }}</td>
+                    <td>{{ application.applicationClassID }}</td>
+                    <td>{{ application.course.courseName }}</td>
+                    <td>{{ application.enrolmentPeriodID }}</td>
+                    <td>{{ application.class.endDate }}</td>
+                    <td>{{ application.class.startDate }}</td>
+                    <td>{{ application.applicationDate }}</td>
+                    <td>{{ application.applicationStatus }}</td>
+                    <td>{{ application.administrator.adminName }}</td>
+                    <td>
+                        <table style="border:none">
+                            <tr>
+                                <td>
+                                    <button class="btn btn-info" style="margin: auto;"
+                                        @click="approveItem('Approve',application.applicationID)"> Approve
+                                    </button>
+                                </td> 
+                                <td>
+                                    <button class="btn btn-info" style="margin: auto;"
+                                    @click="approveItem('Reject',application.applicationID)"> Reject
+                                </button>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                    </td>
+                </tr>
+                <tr v-if="applications.length==0">
+                    <td colspan="12">
+                        No data found
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Should you require further assistance, please email the administrator at <a class="mailto"
+                href="mailto:hr@lms.com">hr@lms.com</a> </p>
+    </div>
+    <script>
+        sessionStorage
+        var app = new Vue({
+            el: '#main-container',
+            data: {
+                applications: [],
+                selected:[],
+                selectAll:false,
+                adminID: "",
+                name: "",
+            },
+            mounted: function () {
+                //retrieve sessionStorage
+                this.adminID = sessionStorage.getItem("learnerID");
+                this.name = sessionStorage.getItem("name");
+
+                axios.get('http://localhost:5001/viewapplications/Processing')
+                    .then(response => {
+                        //.data.data happened because the jsonify in python added data
+                        this.applications = response.data;
+                        console.log(this.applications)
+                    });
+            },
+            methods: {
+                select:function(){
+                    this.selected = [];
+                    if (!this.selectAll) {
+                        for (let i in this.applications) {
+
+                            //don't allow to select checkboxes that are hidden. 
+                            //the parent tr is the one with display:none css so we will leverage on this
+
+                            var trId = parseInt(this.applications[i].applicationID);
+                            //get parent tr 
+                            var el = $('#tr'+trId);
+                            //don't select if tr display:none
+                            if(el.css("display")!=undefined){
+                                if(el.css("display").toLowerCase()!='none'.toLowerCase()){
+                                this.selected.push(this.applications[i].applicationID);
+                                }
+                            }
+                            
+                            
+                        }
+                    }
+                },
+                selectItem:function(){
+                    this.selectAll = false;
+                },
+                approval: function (status) {
+                    if(!confirm(status + " the selected application/s?")){
+                        return;
+                    }
+                    if(this.selected.length<=0){
+                        alert("No selected application to process");
+                        return;
+                    }
+                    // status change upon withdrawl, update database
+                    axios.post('http://localhost:5001/approveApplications', {
+                        selected: this.selected,
+                        status: status,
+                        adminID:this.adminID
+                    })
+                        .then(response => {
+                            //alert("You have successfully withdraw your application for " + app.applicationCourseID + ", " + app.applicationCourseName + ", Class " + app.applicationClassID + ".")
+                            location.reload();
+                            return false;
+                        })
+                        .catch(error => {
+                            this.error = error.response.data.message
+                            alert(this.error)
+                        });
+                },
+                approveItem: function (status,id) {
+                    this.selected=[];
+                    this.selected.push(id);
+                    this.approval(status);
+                }
+            }
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#appDetails tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
