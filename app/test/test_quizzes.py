@@ -31,7 +31,6 @@ class TestQuizzes(TestApp):
                     active=1)
 
         qi = QuizInfo(quizID=q.quizID,
-                      classID=q.classID,
                       questionNumber=1,
                       answer='Chicken', 
                       question="What came first?", 
