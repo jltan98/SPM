@@ -4,9 +4,13 @@ sys.path.append('./app')
 if True:  # noqa: E402
     from src.access_materials import quiz, lesson
 
+
 class testwrongquestions(unittest.TestCase):
     def setup(self):
-        self.quiz = quiz(1, "First Test", [True,True,False], "True", 3, 2)
+        self.quiz = quiz(1, 
+                         "First Test",
+                         [True, True, False],
+                         "True", 3, 2)
         
     def tearDown(self):
         self.quiz = None
@@ -15,11 +19,16 @@ class testwrongquestions(unittest.TestCase):
         wrongq = self.quiz.wrongquestiondict()
         self.assertEqual(wrongq, [3])
 
+
 class testviewcontentlist(unittest.TestCase):
     def setup(self):
-        self.lesson = lesson("1", "First,Second,Third", [True,True,False])
+        self.lesson = lesson("1",
+                             "First,Second,Third",
+                             [True, True, False])
+
     def tearDown(self):
         self.lesson = None
+
     def checkcontentlist(self):
         self.assertEqual(self.lesson.json(), {
             'lessonID': 1,
@@ -27,14 +36,18 @@ class testviewcontentlist(unittest.TestCase):
             'viewStatus': [True,True,False]
         })
 
+
 class testprogress(unittest.TestCase):
     def setup(self):
         self.lesson = lesson("1", "First,Second,Third", [True,True,False])
+    
     def tearDown(self):
         self.lesson = None
+
     def checkprogress(self):
         progress = self.lesson.progress()
         self.assertEqual(progress, (2/3*100))
+
 
 if __name__ == "__main__":
     unittest.main()
