@@ -30,7 +30,7 @@ class TestQuizzes(TestApp):
                     sectionID='G6', 
                     active=1)
 
-        qi = QuizInfo(quizID=q.quizID,
+        qi = QuizInfo(quizID=1,
                       questionNumber=1,
                       answer='Chicken', 
                       question="What came first?", 
