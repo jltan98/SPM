@@ -1,4 +1,3 @@
-from enum import unique
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -18,6 +17,7 @@ CORS(app)
 
 class Quizzes(db.Model):
     __tablename__ = 'quizzes'
+
     quizID = db.Column(db.Integer, primary_key=True)
     classID = db.Column(db.String(5), primary_key=True)
     sectionID = db.Column(db.String(10))
@@ -26,14 +26,18 @@ class Quizzes(db.Model):
 
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
+
+    questionNumber = db.Column(db.Integer, primary_key=True)
     quizID = db.Column(db.Integer, db.ForeignKey(
         'quizzes.quizID'))
     classID = db.Column(db.String(5), db.ForeignKey(
         'quizzes.classID'))
-    questionNumber = db.Column(db.Integer, unique, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
+
+
+db.create_all()
 
 
 @app.route("/enter_quiz", methods=['POST'])
