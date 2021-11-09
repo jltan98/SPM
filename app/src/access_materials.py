@@ -2,10 +2,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root' + \
-                                        '@localhost:3306/is212_example'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_size': 100,
                                            'pool_recycle': 280}
@@ -20,7 +20,8 @@ class quiz(db.Model):
 
     quizID = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text)
-    questionStatus = db.Column(db.Boolean) #check if question correct or not and no number used here cause i just gonna use recursive function to get question number
+    # check if question correct or not
+    questionStatus = db.Column(db.Boolean)
     attempted = db.Column(db.Boolean)
     maxMarks = db.Column(db.Integer)
     results = db.Column(db.Integer)
