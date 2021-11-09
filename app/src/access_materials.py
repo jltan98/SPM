@@ -81,7 +81,7 @@ class lesson(db.Model):
             'title': self.title,
             'viewStatus': self.viewStatus,
         }
-    
+
     def to_dict(self):
         """
         'to_dict' converts the object into a dictionary,
