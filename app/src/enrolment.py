@@ -6,11 +6,11 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
-sys.path.append('./app')
+sys.path.append('./app/src')
 if True:  # noqa: E402
-    from src.classobj import Learner, Trainer, Administrator
-    from src.classobj import Classes, Course, Application, enrolmentPeriod
-    from src.enums import ClassesStatus
+    from classobj import Learner, Trainer, Administrator
+    from classobj import Classes, Course, Application, enrolmentPeriod
+    from enums import ClassesStatus
 
 
 app = Flask(__name__)

@@ -373,7 +373,7 @@ class Classes(db.Model):
         return "False"
 
     def GetClassesByStatus(classesStatus):
-        from src.enums import ClassesStatus
+        from enums import ClassesStatus
         if classesStatus == ClassesStatus.FUTURE:
             classes = db.session.query(Classes, Course).filter(
                 Classes.courseID == Course.courseID,
@@ -397,7 +397,7 @@ class Classes(db.Model):
             return classes
 
     def GetClassesJoinCoursesAsDictionary(classesStatus):
-        from src.enums import ClassesStatus
+        from enums import ClassesStatus
         classesStatus = ClassesStatus.ALL
         classes = Classes.GetClassesByStatus(classesStatus)
         db.session.close()
