@@ -55,7 +55,7 @@ def get_course(name):
         return jsonify({
             "message": "Person not found."
         }), 404
-        
+
 
 @app.route("/trainers/<string:trainerID>")
 def trainer_by_id(trainerID):
@@ -176,7 +176,7 @@ def get_applications(learnerID):
         return jsonify({
             "message": "Person not found."
         }), 404
-        
+
 
 @app.route("/applications_json/<string:applicationLearnerID>")
 def applicationStatus(applicationLearnerID):
