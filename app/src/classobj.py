@@ -360,6 +360,17 @@ class Classes(db.Model):
             'enrolmentPeriodID': self.enrolmentPeriodID,
         }
 
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+        
     def class_for_currEnrolmentPeriod(self, enddate, course, trainer):
         if (self.startDate > enddate):
             return {
