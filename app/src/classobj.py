@@ -379,19 +379,19 @@ class Classes(db.Model):
                                                                                 Classes.enrolmentPeriodID == enrolmentPeriod.enrolmentPeriodID, # noqa
                                                                                 Classes.startDate > datetime.now()) # noqa
             return classes
-        elif classesStatus==ClassesStatus.PAST:
+        elif classesStatus == ClassesStatus.PAST:
             classes = db.session.query(Classes,Course,enrolmentPeriod).filter(Classes.courseID==Course.courseID, # noqa
                                                                               Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID, # noqa
                                                                               Classes.endDate<datetime.now()) # noqa
             return classes
-        elif classesStatus==ClassesStatus.STARTED:
+        elif classesStatus == ClassesStatus.STARTED:
             classes = db.session.query(Classes,Course,enrolmentPeriod).filter(Classes.courseID==Course.courseID, # noqa
                                                                               Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID, # noqa
                                                                               Classes.startDate<=datetime.now(), # noqa
                                                                               Classes.endDate>=datetime.now()) # noqa
             return classes
         else:
-            #all classes past present future
+            # all classes past present future
             classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID, # noqa
                      Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID) # noqa
             return classes
@@ -399,17 +399,17 @@ class Classes(db.Model):
     def GetClassesJoinCoursesAsDictionary(classesStatus=ClassesStatus.ALL):
         classes = Classes.GetClassesByStatus(classesStatus)
         db.session.close()
-        #create list of classes. We will add the course prerequisite information
-        classesWithPrereq=[]
+        # create list of classes. Add the course prerequisite information
+        classesWithPrereq = []
 
         #iterate all classes
         for c in classes:
             #create dictionary to store the class details
             #we want dictionary so we can easily convert to json later
-            dictClassWithPrereq={}
+            dictClassWithPrereq = {}
 
-            #class details. c[0] is for Classes, c[1] is for Course. 
-            # In db.session.query(Classes,Course,ApplicationPriod), 
+            # class details. c[0] is for Classes, c[1] is for Course.
+            # In db.session.query(Classes,Course,ApplicationPriod),
             # Classes index =0, Course index=1, ApplicationPeriod=2
             dictClassWithPrereq["classID"] = c[0].classID
             dictClassWithPrereq["courseID"] = c[0].courseID
@@ -418,30 +418,30 @@ class Classes(db.Model):
             dictClassWithPrereq["enrolmentPeriodID"] = c[0].enrolmentPeriodID
             dictClassWithPrereq["startDate"] = c[0].startDate
             dictClassWithPrereq["endDate"] = c[0].endDate
-            #split the string to an array
+            # split the string to an array
             dictClassWithPrereq["coursePrereq"] = c[1].prerequisite.split(',')
 
             
-            #create dictionary to store the course details
+            # create dictionary to store the course details
             dictCourse = {}
 
-            #course details. Get from [1]
+            # course details. Get from [1]
             dictCourse["courseID"] = c[1].courseID
             dictCourse["courseName"] = c[1].courseName
             dictCourse["courseDescription"] = c[1].courseDescription
             dictCourse["subjectcategory"] = c[1].subjectcategory
             dictCourse["prerequisite"] = c[1].prerequisite.split(',')
 
-            #add the details to course in class details
+            # add the details to course in class details
             dictClassWithPrereq["course"] = dictCourse
 
-            #create dictionary to store the EnrolmentPeriod. Get from [2]
+            # create dictionary to store the EnrolmentPeriod. Get from [2]
             dictEnrolmentPeriod = {}
             dictEnrolmentPeriod["enrolmentPeriodID"] = c[2].enrolmentPeriodID
             dictEnrolmentPeriod["enrolmentStartDate"] = c[2].enrolmentStartDate
             dictEnrolmentPeriod["enrolmentEndDate"] = c[2].enrolmentEndDate
             dictClassWithPrereq["enrolmentPeriod"] = dictEnrolmentPeriod
-            #add the class details to the class list
+            # add the class details to the class list
             classesWithPrereq.append(dictClassWithPrereq)
             
         return classesWithPrereq
