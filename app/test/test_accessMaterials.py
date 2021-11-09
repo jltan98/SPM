@@ -7,14 +7,14 @@ if True:  # noqa: E402
 
 class testwrongquestions(unittest.TestCase):
     def setup(self):
-        self.quiz = quiz(1, 
+        self.quiz = quiz(1,
                          "First Test",
                          [True, True, False],
                          "True", 3, 2)
-        
+
     def tearDown(self):
         self.quiz = None
-    
+
     def checkwrongquestion(self):
         wrongq = self.quiz.wrongquestiondict()
         self.assertEqual(wrongq, [3])
@@ -33,13 +33,15 @@ class testviewcontentlist(unittest.TestCase):
         self.assertEqual(self.lesson.json(), {
             'lessonID': 1,
             'title': "First,Second,Third",
-            'viewStatus': [True,True,False]
+            'viewStatus': [True, True, False]
         })
 
 
 class testprogress(unittest.TestCase):
     def setup(self):
-        self.lesson = lesson("1", "First,Second,Third", [True,True,False])
+        self.lesson = lesson("1",
+                             "First,Second,Third",
+                             [True, True, False])
     
     def tearDown(self):
         self.lesson = None
