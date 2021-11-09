@@ -3,6 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
+from enums import ApplicationStatus,ClassesStatus
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
@@ -373,66 +374,67 @@ class Classes(db.Model):
         return "False"
 
     def GetClassesByStatus(classesStatus):
-        from src.enums import ClassesStatus
-        if classesStatus == ClassesStatus.FUTURE:
-            classes = db.session.query(Classes, Course).filter(
-                Classes.courseID == Course.courseID,
-                Classes.startDate > datetime.now())
+        if classesStatus==ClassesStatus.FUTURE:
+            classes = db.session.query(Classes,Course,enrolmentPeriod).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID,Classes.startDate>datetime.now())
             return classes
-        elif classesStatus == ClassesStatus.PAST:
-            classes = db.session.query(Classes, Course).filter(
-                Classes.courseID == Course.courseID,
-                Classes.endDate < datetime.now())
+        elif classesStatus==ClassesStatus.PAST:
+            classes = db.session.query(Classes,Course,enrolmentPeriod).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID,Classes.endDate<datetime.now())
             return classes
-        elif classesStatus == ClassesStatus.STARTED:
-            classes = db.session.query(Classes, Course).filter(
-                Classes.courseID == Course.courseID,
-                Classes.startDate <= datetime.now(),
-                Classes.endDate >= datetime.now())
+        elif classesStatus==ClassesStatus.STARTED:
+            classes = db.session.query(Classes,Course,enrolmentPeriod).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID,Classes.startDate<=datetime.now(),Classes.endDate>=datetime.now())
             return classes
         else:
-            # all classes past present future
-            classes = db.session.query(Classes, Course).filter(
-                Classes.courseID == Course.courseID)
+            #all classes past present future
+            classes = db.session.query(Classes,Course).filter(Classes.courseID==Course.courseID,Classes.enrolmentPeriodID==enrolmentPeriod.enrolmentPeriodID)
             return classes
-
-    def GetClassesJoinCoursesAsDictionary(classesStatus):
-        from src.enums import ClassesStatus
-        classesStatus = ClassesStatus.ALL
+        
+    def GetClassesJoinCoursesAsDictionary(classesStatus=ClassesStatus.ALL):
+        #get classes based on status
         classes = Classes.GetClassesByStatus(classesStatus)
         db.session.close()
-        classesWithPrereq = []
+        #create list of classes. We will add the course prerequisite information
+        classesWithPrereq=[]
+
+        #iterate all classes
         for c in classes:
-            dictClassWithPrereq = {}
-            # class details. c[0] is for Classes, c[1] is for Course.
-            # db.session.query(Classes,Course),Classes_index=0,Course_index=1
-            dictClassWithPrereq["classID"] = c[0].classID
-            dictClassWithPrereq["courseID"] = c[0].courseID
-            dictClassWithPrereq["noOfSlots"] = c[0].noOfSlots
-            dictClassWithPrereq["trainerAssignedID"] = c[0].trainerAssignedID
-            dictClassWithPrereq["enrolmentPeriodID"] = c[0].enrolmentPeriodID
-            dictClassWithPrereq["startDate"] = c[0].startDate
-            dictClassWithPrereq["endDate"] = c[0].endDate
-            # split the string to an array
-            dictClassWithPrereq["coursePrereq"] = c[1].prerequisite.split(',')
-            # create dictionary to store the course details
-            dictCourse = {}
-            # course details
-            dictCourse["courseID"] = c[1].courseID
-            dictCourse["courseName"] = c[1].courseName
-            dictCourse["courseDescription"] = c[1].courseDescription
-            dictCourse["subjectcategory"] = c[1].subjectcategory
-            dictCourse["prerequisite"] = c[1].prerequisite.split(',')
-            # add the details to course in class details
-            dictClassWithPrereq["course"] = dictCourse
-            # create dictionary to store the EnrolmentPeriod. Get from [2]
-            dictEnrolmentPeriod = {}
-            dictEnrolmentPeriod["enrolmentPeriodID"] = c[2].enrolmentPeriodID
-            dictEnrolmentPeriod["enrolmentStartDate"] = c[2].enrolmentStartDate
-            dictEnrolmentPeriod["enrolmentEndDate"] = c[2].enrolmentEndDate
-            dictClassWithPrereq["enrolmentPeriod"] = dictEnrolmentPeriod
-            # add the class details to the class list
+            #create dictionary to store the class details
+            #we want dictionary so we can easily convert to json later
+            dictClassWithPrereq={}
+
+            #class details. c[0] is for Classes, c[1] is for Course. In db.session.query(Classes,Course,ApplicationPriod), Classes index =0, Course index=1, ApplicationPeriod=2
+            dictClassWithPrereq["classID"]=c[0].classID
+            dictClassWithPrereq["courseID"]=c[0].courseID
+            dictClassWithPrereq["noOfSlots"]=c[0].noOfSlots
+            dictClassWithPrereq["trainerAssignedID"]=c[0].trainerAssignedID
+            dictClassWithPrereq["enrolmentPeriodID"]=c[0].enrolmentPeriodID
+            dictClassWithPrereq["startDate"]=c[0].startDate
+            dictClassWithPrereq["endDate"]=c[0].endDate
+            #split the string to an array
+            dictClassWithPrereq["coursePrereq"]=c[1].prerequisite.split(',')
+
+            
+            #create dictionary to store the course details
+            dictCourse={}
+
+            #course details. Get from [1]
+            dictCourse["courseID"]=c[1].courseID
+            dictCourse["courseName"]=c[1].courseName
+            dictCourse["courseDescription"]=c[1].courseDescription
+            dictCourse["subjectcategory"]=c[1].subjectcategory
+            dictCourse["prerequisite"]=c[1].prerequisite.split(',')
+
+            #add the details to course in class details
+            dictClassWithPrereq["course"]=dictCourse
+
+            #create dictionary to store the EnrolmentPeriod. Get from [2]
+            dictEnrolmentPeriod={}
+            dictEnrolmentPeriod["enrolmentPeriodID"]=c[2].enrolmentPeriodID
+            dictEnrolmentPeriod["enrolmentStartDate"]=c[2].enrolmentStartDate
+            dictEnrolmentPeriod["enrolmentEndDate"]=c[2].enrolmentEndDate
+            dictClassWithPrereq["enrolmentPeriod"]=dictEnrolmentPeriod
+            #add the class details to the class list
             classesWithPrereq.append(dictClassWithPrereq)
+            
         return classesWithPrereq
 
 
