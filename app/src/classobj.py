@@ -3,7 +3,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
-from enums import ClassesStatus
+import sys
+sys.path.append('./app/src')
+if True:  # noqa: E402
+    from enums import ClassesStatus
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
