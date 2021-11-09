@@ -15,6 +15,11 @@ db = SQLAlchemy(app)
 CORS(app)
 
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
 class Quizzes(db.Model):
     __tablename__ = 'quizzes'
 
