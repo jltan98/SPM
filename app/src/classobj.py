@@ -402,10 +402,10 @@ class Classes(db.Model):
         # create list of classes. Add the course prerequisite information
         classesWithPrereq = []
 
-        #iterate all classes
+        # iterate all classes
         for c in classes:
-            #create dictionary to store the class details
-            #we want dictionary so we can easily convert to json later
+            # create dictionary to store the class details
+            # we want dictionary so we can easily convert to json later
             dictClassWithPrereq = {}
 
             # class details. c[0] is for Classes, c[1] is for Course.
@@ -421,7 +421,6 @@ class Classes(db.Model):
             # split the string to an array
             dictClassWithPrereq["coursePrereq"] = c[1].prerequisite.split(',')
 
-            
             # create dictionary to store the course details
             dictCourse = {}
 
@@ -443,7 +442,6 @@ class Classes(db.Model):
             dictClassWithPrereq["enrolmentPeriod"] = dictEnrolmentPeriod
             # add the class details to the class list
             classesWithPrereq.append(dictClassWithPrereq)
-            
         return classesWithPrereq
 
 
