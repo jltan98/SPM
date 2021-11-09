@@ -19,7 +19,7 @@ class Quizzes(db.Model):
     __tablename__ = 'quizzes'
 
     quizID = db.Column(db.Integer, primary_key=True)
-    classID = db.Column(db.String(5), primary_key=True)
+    classID = db.Column(db.String(5))
     sectionID = db.Column(db.String(10))
     active = db.Column(db.Boolean)
 
@@ -27,11 +27,9 @@ class Quizzes(db.Model):
 class QuizInfo(db.Model):
     __tablename__ = 'quizInfo'
 
-    questionNumber = db.Column(db.Integer, primary_key=True)
     quizID = db.Column(db.Integer, db.ForeignKey(
-        'quizzes.quizID'))
-    classID = db.Column(db.String(5), db.ForeignKey(
-        'quizzes.classID'))
+        'quizzes.quizID'), primary_key=True)
+    questionNumber = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.Text())
     answer = db.Column(db.Text())
     selections = db.Column(db.JSON)
@@ -62,7 +60,6 @@ def register():
 
     quizInfo = QuizInfo(
         quizID=data['quizID'],
-        classID=data['classID'],
         questionNumber=data['questionNumber'],
         question=data['question'],
         answer=data['answer'],
