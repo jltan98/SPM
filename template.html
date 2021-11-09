@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Bell Notif</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR ALL ADMIN PAGES -->
+    <div id="main-container" class="container">
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+
+                <li class="nav-item">
+                    <a href="" class="nav-link active">link</a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link">link</a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link">link</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            
+                <!-- PUT BELL HERE? -->
+               
+                <div class="dropdown">
+                    <button id="bell" onclick="dropdown()" class="btn btn-link">
+                        </button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <div id="dropdown-contents">
+                          
+                      </div>
+                    </div>
+                  </div>
+
+            </ul>
+        </div>
+     <!-- NAVBAR ALL ADMIN PAGES -->
+        <br>
+        <h2 class="title display-6">title</h2>
+        <br>
+
+        <input class="form-control" id="search" type="text" placeholder="Search...">
+        <br>
+
+        <!-- PUT CONTENT HERE -->
+
+        
+    
+
+        <p>Should you require further assistance, please email the administrator at <a class="mailto"
+                href="mailto:hr@lms.com">hr@lms.com</a> </p>
+    </div>
+
+    <!-- SCRIPTS HERE -->
+
+
+    
+</body>
+
+</html>
