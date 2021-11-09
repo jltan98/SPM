@@ -24,6 +24,7 @@ const app = Vue.createApp({
         axios.get('http://localhost:5002/classes/T001', {
     })
         .then(response => {
+            console.log(response)
             data = response.data.data
             for(sections of data){
                 section = sections.classID
