@@ -19,26 +19,6 @@ db = SQLAlchemy(app)
 
 CORS(app)
 
-class Classes(db.Model):
-    __tablename__ = 'classes'
-    classID = db.Column(db.String(64),primary_key=True)
-    courseID = db.Column(db.String(64),primary_key=True)
-    noOfSlots = db.Column(db.Integer())
-    trainerAssignedID = db.Column(db.String(64))
-    startDate = (db.DateTime())
-    endDate = db.Column(db.DateTime())
-    enrolmentPeriodID = db.Column(db.String(64))
-
-    def to_dict(self):
-        """
-        'to_dict' converts the object into a dictionary,
-        in which the keys correspond to database columns
-        """
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            result[column] = getattr(self, column)
-        return result
 
 class Quizzes(db.Model):
     __tablename__ = 'quizzes'
