@@ -108,7 +108,7 @@
                 this.learnerID = sessionStorage.getItem("learnerID");
                 this.name = sessionStorage.getItem("name");
 
-                axios.get('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/applications/' + this.learnerID)
+                axios.get('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/applications_json/' + this.learnerID)
                     .then(response => {
                         this.applications = response.data.data;
                         console.log(this.applications)
