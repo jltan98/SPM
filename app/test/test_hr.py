@@ -37,7 +37,6 @@ class TestLearner(TestApp):
 
         response = self.client.get("/learnerCurrAppliedCourse/" + learner.learnerID)
         learnerCurrentAppliedCourses = json.loads(response.data)
-        print(learnerCurrentAppliedCourses)
         expectedValue = ['IS212']
         self.assertEqual(expectedValue, learnerCurrentAppliedCourses)
 
