@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import os
 import sys
+import json
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 sys.path.append('./app/src')
@@ -38,6 +39,7 @@ class Quizzes(db.Model):
             result[column] = getattr(self, column)
         return result
 
+
 class QuizInfo(db.Model):
     __tablename__ = 'quizinfo'
     quizID = db.Column(db.Integer(), primary_key=True)
@@ -64,13 +66,14 @@ def get_quiz():
 
     if quizzes:
             return jsonify({
-                "data": [quiz.to_dict() for quiz in quizzes]
+                "data": json.dumps([quiz.to_dict() for quiz in quizzes])
             }), 200
     else:
         return jsonify({
             "message": "Person not found."
         }), 404
-        
+
+
 @app.route("/quiz_info/<quizID>", methods=['GET'])
 def get_quiz_info(quizID):
     quizzes = QuizInfo.query.filter_by(quizID=quizID).all()
