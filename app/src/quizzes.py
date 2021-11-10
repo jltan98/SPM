@@ -39,8 +39,8 @@ class QuizInfo(db.Model):
     selections = db.Column(db.JSON)
 
 
-@app.route("/enterquiz", methods=['POST', 'PUT'])
-def register():
+@app.route("/enterquiz", methods=['POST'])
+def enterQuiz():
     data = request.get_json()
     if not all(key in data.keys() for
                key in ('quizID', 'classID', 'sectionID', 'active',
@@ -49,8 +49,6 @@ def register():
         return jsonify({
             "message": "Incorrect JSON object provided."
         }), 500
-
-    print(data['quizID'])
 
     quiz = Quizzes(
         quizID=data['quizID'],
@@ -70,7 +68,7 @@ def register():
     db.session.add(quiz)
     db.session.add(quizInfo)
     db.session.commit()
-    return data
+    return jsonify({quiz, quizInfo})
 
 
 if __name__ == '__main__':
