@@ -62,6 +62,9 @@ class TestQuizzes(TestApp):
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
+        print(response)
+        print(response.data)
+        print(response.json)
         self.assertEqual(response.json, {
             'quizID': 2,
             'classID': "IS111",
