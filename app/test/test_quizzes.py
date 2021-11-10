@@ -37,7 +37,7 @@ class TestQuizzes(TestApp):
                       answer='Chicken',
                       question="What came first?",
                       selections={
-                          "selection": [
+                          "options": [
                               "chicken",
                               "egg",
                               "hen",
@@ -57,12 +57,11 @@ class TestQuizzes(TestApp):
                 "questionNumber": 1,
                 "question": "What came first?",
                 "selections": {
-                    "selection": [
+                    "options": [
                         "chicken",
                         "egg",
                         "hen",
-                        "rooster"
-                    ]
+                        "rooster"]
                 }
             }
         }
