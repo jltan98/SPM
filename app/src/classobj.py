@@ -370,7 +370,7 @@ class Classes(db.Model):
         for column in columns:
             result[column] = getattr(self, column)
         return result
-        
+
     def class_for_currEnrolmentPeriod(self, enddate, course, trainer):
         if (self.startDate > enddate):
             return {
