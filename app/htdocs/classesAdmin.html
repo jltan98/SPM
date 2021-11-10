@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>View Classes - Admin</title>
+
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <link rel="stylesheet" type="text/css" href="./styles/style.css" />
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/vue"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <!-- template for the modal component -->
+    <script type="text/x-template" id="modal-template">
+        <transition name="modal">
+          <div class="modal-mask">
+            <div class="modal-wrapper">
+              <div class="modal-container">
+  
+                <div class="modal-header">
+                  <slot name="header">
+                    
+                    
+                  </slot>
+                </div>
+  
+                <div class="modal-body">
+                  <slot name="body">
+                    default body
+                  </slot>
+                </div>
+  
+                <div class="modal-footer">
+                  <slot name="footer">
+                    default footer
+                    <button class="modal-default-button" @click="$emit('close')">
+                      OK
+                    </button>
+                  </slot>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </script>
+</head>
+
+<body>
+    <div id="main-container" class="container">
+        <modal v-if="showModal" @close="showModal = false">
+            <template v-slot:header>
+                Trainers
+            </template>
+	    <template v-slot:body>
+          <table>
+              <thead>
+                <tr >
+                    <th>Trainer ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Skills</th>
+                    <th>Experience</th>
+                    <th>Courses Taught</th>
+                    <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="trainer in trainers">
+                      <td>{{trainer.trainerID}}</td>
+                      <td>{{trainer.trainerName}}</td>
+                      <td>{{trainer.trainerContact}}</td>
+                      <td>
+                        <div v-for="skill in trainer.skills">
+                            <div>
+                                <span>
+                                    {{skill}}
+                                </span>
+                            </div>
+                        </div>    
+
+                      </td>
+                      <td>
+                        <div v-for="exp in trainer.experience">
+                            <div>
+                                <span>
+                                    {{exp}}
+                                </span>
+                            </div>
+                        </div>                              
+                      </td>
+                      <td>
+                        <div v-for="course in trainer.coursesTaught">
+                            <div>
+                                <span>
+                                    {{course}}
+                                </span>
+                            </div>
+                        </div>    
+                      </td>
+                      <td><input type="button" @click="assignTrainerToClass(trainer)" value="Assign trainer to class"></input></td>
+                  </tr>
+              </tbody>
+	    </table>
+        </template>
+        <template v-slot:footer>
+            <input type="button" @click="cancelModal()" value="Cancel"></input>
+        </template>
+	</modal>
+
+
+            <!-- NAVBAR ALL ADMIN PAGES -->
+    <div id="main-container" class="container">
+        <div class="bs-example">
+            <ul class="nav nav-tabs mt-3">
+
+                <li class="nav-item">
+                    <a href="./applicationAdmin.html" class="nav-link">Applications</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./learnersAdmin.html" class="nav-link">Learners</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./classesAdmin.html" class="nav-link active">Trainers</a>
+                </li>
+                <li class="nav-item ml-auto">
+                    <p style="text-align:right; margin:0px auto 0px auto; font-style: Lato;"><span
+                            id="name"></span>&nbsp;&nbsp; Welcome, {{ name }}</p>
+                </li>
+            </ul>
+        </div>
+    <!-- NAVBAR ALL ADMIN PAGES -->
+
+    <br>
+    <h2 class="title display-6">Manage Classes</h2>
+    <br>
+
+        <input class="form-control" id="search" type="text" placeholder="Search..">
+    <br>
+
+        <table id="appTable" class='table table-bordered'>
+            <thead class="thead-dark">
+                <tr>
+                    <th>Class ID</th>
+                    <th>Course</th>
+                    <th>Slots</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Enrolment Start Date</th>
+                    <th>Enrolment End Date</th>
+                    <th>Assigned Trainer</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="appDetails">
+                <tr :id="'tr'+clas.classID+'-'+clas.courseID+''+clas.enrolmentPeriodID" v-for="clas in classes">    
+                    <td>{{ clas.classID }}</td>
+                    <td>{{ clas.course.courseName }}</td>
+                    <td>{{ clas.noOfSlots }}</td>
+                    <td>{{ clas.startDate }}</td>
+                    <td>{{ clas.endDate }}</td>
+                    <td>{{ clas.enrolmentPeriod.enrolmentStartDate }}</td>
+                    <td>{{ clas.enrolmentPeriod.enrolmentEndDate }}</td>
+                    <td>
+                            {{clas.trainerAssignedID}}                   
+                    </td>
+                    <td>
+                            <button class="btn btn-info" style="margin: auto;"
+                            @click="selectClass(clas)"> Assign trainer
+                        </button>
+                    </td>
+                </tr>
+                <tr v-if="classes.length==0">
+                    <td colspan="12">
+                        No data found
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Should you require further assistance, please email the administrator at <a class="mailto"
+                href="mailto:hr@lms.com">hr@lms.com</a> </p>
+    </div>
+    
+      
+    <script>
+        sessionStorage
+        Vue.component("modal",{
+            template:"#modal-template"
+        });
+        var app = new Vue({
+            el: '#main-container',
+            data: {
+                trainers:[],
+                classes: [],
+                currentClass:{},
+                adminID: "",
+                name: "",
+                showModal:false
+            },
+            mounted: function () {
+                //retrieve sessionStorage
+                this.adminID = sessionStorage.getItem("learnerID");
+                this.name = sessionStorage.getItem("name");
+                this.getClasses();
+            },
+            methods: {
+                getClasses:function(){
+                    axios.get('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/viewClasses')
+                        .then(response => {
+                            this.classes = response.data;
+                            console.log(this.classes);
+                            this.getTrainers();
+                        });
+
+                },
+                getTrainers:function(){
+                    axios.get('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/trainers')
+                            .then(response => {
+                                this.trainers = response.data.data;
+                                console.log(this.trainers)
+                            });
+                },
+                selectClass:function(clas){
+                    this.currentClass=clas;
+                    this.showModal=true;
+                },
+                assignTrainerToClass(trainer){
+                    var assign = confirm("assign " + trainer.trainerName + " to class: " + this.currentClass.classID + " : " + this.currentClass.course.courseName + " : " + this.currentClass.enrolmentPeriodID );
+                    if(assign){
+                        axios.post('http://ec2-44-196-228-15.compute-1.amazonaws.com:5001/updateClassTrainer', {
+                            classID:this.currentClass.classID,
+                            courseID:this.currentClass.courseID,
+                            enrolmentPeriodID:this.currentClass.enrolmentPeriodID,
+                            trainerAssignedID:trainer.trainerID
+                    })
+                        .then(response => {
+                            alert("You have successfully assigned trainer to class");// + app.applicationCourseID + ", " + app.applicationCourseName + ", Class " + app.applicationClassID + ".")
+                            this.showModal=false;
+                            this.getClasses();
+                            return false;
+                        })
+                        .catch(error => {
+                            this.error = error.response.data.message
+                            alert(this.error)
+                        });
+                    } 
+                },
+                cancelModal:function(){
+                    this.showModal=false;
+                },
+                
+            }
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#search").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#appDetails tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

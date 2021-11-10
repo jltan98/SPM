@@ -5,6 +5,7 @@ if True:  # noqa: E402
     from src.access_materials import quiz, lesson
 
 
+# Group Member: C. SNEKHA
 class testwrongquestions(unittest.TestCase):
     def setup(self):
         self.quiz = quiz(1,

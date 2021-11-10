@@ -7,6 +7,7 @@ if True:  # noqa: E402
     from src.classobj import Course, Classes, Application, enrolmentPeriod
 
 
+# Group Member: TAN JIA LENG
 class TestViewTrainers(unittest.TestCase):
     def setUp(self):
         self.trainer = Trainer('Anne', 'T001', 'anne@lms.com',

@@ -9,6 +9,7 @@ if True:  # noqa: E402
     from src.enrolment import app
 
 
+# Group Member: MONTERO AEOLE JASMINE FEDERICO
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
