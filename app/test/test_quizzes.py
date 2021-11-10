@@ -43,7 +43,7 @@ class TestQuizzes(TestApp):
         # db.session.add(qi)
         # db.session.commit()
 
-        request_body = [{
+        request_body = {
                 "quizID": 2,
                 "classID": "IS111",
                 "sectionID": "G6",
@@ -52,7 +52,7 @@ class TestQuizzes(TestApp):
                 "questionNumber": 1,
                 "question": "What came first?",
                 "selections": {"selection": ["chicken", "egg", "hen", "rooster"]}
-        }]
+        }
 
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
