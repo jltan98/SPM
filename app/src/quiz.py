@@ -57,6 +57,7 @@ class QuizInfo(db.Model):
             result[column] = getattr(self, column)
         return result
 
+
 @app.route("/quiz", methods=['GET'])
 def get_quiz():
     quizzes = Quizzes.query.all()

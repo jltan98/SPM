@@ -36,12 +36,13 @@ class TestLearner(TestApp):
 
         url = "/quiz"
         response = self.client.get(url)
-        quiz_dict = response.data.data
-        expectedValue = {'quizID': 2,
+        quiz_dict = response.data
+        
+        expectedValue = bytes({'quizID': 2,
                          'classID': "IS111",
                          'sectionID': "G6",
                          'active': True,
-                        }
+                        })
         self.assertEqual(expectedValue, quiz_dict)
 
 
