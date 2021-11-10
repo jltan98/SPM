@@ -36,13 +36,9 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections={
-                          "options": [
-                              "chicken",
-                              "egg",
-                              "hen",
-                              "rooster"
-                          ]})
+                      selections=json.dumps({"options": ["chicken","egg", "hen", "rooster"]})
+                      )
+
         db.session.add(q)
         db.session.add(qi)
         db.session.commit()
@@ -58,10 +54,7 @@ class TestQuizzes(TestApp):
                 "question": "What came first?",
                 "selections": {
                     "options": [
-                        "chicken",
-                        "egg",
-                        "hen",
-                        "rooster"]
+                        "chicken","egg","hen","rooster"]
                 }
             }
         }
