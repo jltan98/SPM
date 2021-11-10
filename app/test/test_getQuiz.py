@@ -25,7 +25,7 @@ class TestApp(flask_testing.TestCase):
         db.drop_all()
 
 
-class TestLearner(TestApp):
+class TestgetQuiz(TestApp):
     def test_getQuizzes(self):
         quizzes = Quizzes(quizID=2,
                           classID='IS111',
