@@ -20,23 +20,23 @@ def shutdown_session(exception=None):
     db.session.remove()
 
 
-# class Quizzes(db.Model):
-#     __tablename__ = 'quizzes'
+class Quizzes(db.Model):
+    __tablename__ = 'quizzes'
 
-#     quizID = db.Column(db.Integer, primary_key=True)
-#     classID = db.Column(db.String(5))
-#     sectionID = db.Column(db.String(10))
-#     active = db.Column(db.Boolean)
+    quizID = db.Column(db.Integer, primary_key=True)
+    classID = db.Column(db.String(5))
+    sectionID = db.Column(db.String(10))
+    active = db.Column(db.Boolean)
 
 
-# class QuizInfo(db.Model):
-#     __tablename__ = 'quizInfo'
+class QuizInfo(db.Model):
+    __tablename__ = 'quizInfo'
 
-#     quizID = db.Column(db.Integer, primary_key=True)
-#     questionNumber = db.Column(db.Integer, primary_key=True)
-#     question = db.Column(db.Text())
-#     answer = db.Column(db.Text())
-#     selections = db.Column(db.JSON)
+    quizID = db.Column(db.Integer, primary_key=True)
+    questionNumber = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.Text())
+    answer = db.Column(db.Text())
+    selections = db.Column(db.JSON)
 
 
 @app.route("/enter_quiz", methods=['POST'])
