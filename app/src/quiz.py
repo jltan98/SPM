@@ -78,9 +78,9 @@ def get_quiz_info(quizID):
     quizzes = QuizInfo.query.filter_by(quizID=quizID).all()
 
     if quizzes:
-            return jsonify({
-                "data": [quiz.to_dict() for quiz in quizzes]
-            }), 200
+        return jsonify({
+            "data": [quiz.to_dict() for quiz in quizzes]
+        }), 200
     else:
         return jsonify({
             "message": "Person not found."
