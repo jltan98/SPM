@@ -2,7 +2,6 @@ import unittest
 import flask_testing
 import json
 import sys
-import os
 sys.path.append('./app')
 if True:  # noqa: E402
     from src.quizzes import db, app
@@ -40,7 +39,7 @@ class TestQuizzes(TestApp):
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
-        
+
         self.assertEqual(response.json, 
         {"quizID": 2,
          "classID": "IS111",
@@ -54,3 +53,4 @@ class TestQuizzes(TestApp):
 
 if __name__ == '__main__':
     unittest.main()
+
