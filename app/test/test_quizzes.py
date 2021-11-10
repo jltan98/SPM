@@ -27,40 +27,44 @@ class TestApp(flask_testing.TestCase):
 
 class TestQuizzes(TestApp):
     def test_create_quiz(self):
-        q = Quizzes(quizID=2, 
-                    classID='IS111', 
-                    sectionID='G6', 
+        q = Quizzes(quizID=2,
+                    classID='IS111',
+                    sectionID='G6',
                     active=1)
 
         qi = QuizInfo(quizID=2,
                       questionNumber=1,
-                      answer='Chicken', 
-                      question="What came first?", 
+                      answer='Chicken',
+                      question="What came first?",
                       selections={
-                                    "selection": [
-                                        "chicken",
-                                        "egg",
-                                        "hen",
-                                        "rooster"
-                                    ]})
+                          "selection": [
+                              "chicken",
+                              "egg",
+                              "hen",
+                              "rooster"
+                          ]})
         db.session.add(q)
         db.session.add(qi)
         db.session.commit()
 
         request_body = {
-            'quizID': 2,
-            'classID': 'IS111',
-            'sectionID': 'G6',
-            'active': 1,
-            'answer': 'Chicken',
-            'questionNumber': 1,
-            'question': 'What came first?',
-            'selections': {"selection": ["chicken",
-                                         "egg",
-                                         "hen",
-                                         "rooster"
-                                        ]
-                            },
+            {
+                "quizID": 2,
+                "classID": "IS111",
+                "sectionID": "G6",
+                "active": 1,
+                "answer": "Chicken",
+                "questionNumber": 1,
+                "question": "What came first?",
+                "selections": {
+                    "selection": [
+                        "chicken",
+                        "egg",
+                        "hen",
+                        "rooster"
+                    ]
+                }
+            }
         }
 
         response = self.client.post("/enter_quiz",
@@ -75,7 +79,7 @@ class TestQuizzes(TestApp):
             'active': 1,
             'questionNumber': 1,
             'question': "What came first?",
-            'selections' :{
+            'selections': {
                 "selection": [
                     "chicken",
                     "egg",
@@ -85,6 +89,6 @@ class TestQuizzes(TestApp):
             }
         })
 
-        
+
 if __name__ == '__main__':
     unittest.main()
