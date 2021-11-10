@@ -36,14 +36,14 @@ class TestLearner(TestApp):
 
         url = "/quiz"
         response = self.client.get(url)
-        quiz_dict = response.data
-        
+        quiz_dict = response.data.decode('utf8')
+        returnVal = json.loads(quiz_dict)
         expectedValue = bytes({'quizID': 2,
                          'classID': "IS111",
                          'sectionID': "G6",
-                         'active': 1,
+                         'active': ,
                         })
-        self.assertEqual(expectedValue, quiz_dict)
+        self.assertEqual(expectedValue, returnVal)
 
 
 if __name__ == "__main__":
