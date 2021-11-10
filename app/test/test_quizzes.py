@@ -38,7 +38,7 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections=jsonify({"options": ["chicken","egg","hen","rooster"]})
+                      selections={"options": ["chicken","egg","hen","rooster"]}
                       )
 
         db.session.add(q)
