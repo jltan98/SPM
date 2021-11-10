@@ -54,7 +54,11 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections":[{"selections": ["chicken","egg","hen","rooster"]}]
+                "selections":
+                [{"1": "chicken",
+                  "2": "egg",
+                  "3": "hen",
+                  "4": "rooster"}]
             }
         }
 
