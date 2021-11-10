@@ -54,7 +54,7 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections":json.dumps({"selections": ['chicken','egg','hen','rooster']})
+                "selections":[{"selections": ['chicken','egg','hen','rooster']}]
             }
         }
 
