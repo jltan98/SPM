@@ -38,7 +38,7 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections={"selections": ["chicken","egg","hen","rooster"]}
+                      selections=[{"selections": ["chicken","egg","hen","rooster"]}]
                       )
 
         db.session.add(q)
@@ -54,7 +54,7 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections":{"selections": ["chicken","egg","hen","rooster"]}
+                "selections":[{"selections": ["chicken","egg","hen","rooster"]}]
             }
         }
 

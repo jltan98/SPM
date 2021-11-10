@@ -71,7 +71,8 @@ def get_quiz():
         return jsonify({
             "message": "Person not found."
         }), 404
-        
+
+
 @app.route("/quiz_info/<quizID>", methods=['GET'])
 def get_quiz_info(quizID):
     quizzes = QuizInfo.query.filter_by(quizID=quizID).all()
@@ -84,6 +85,7 @@ def get_quiz_info(quizID):
         return jsonify({
             "message": "Person not found."
         }), 404
+
 
 @app.route("/classes/<trainerID>", methods=['GET'])
 def get_classes(trainerID):
