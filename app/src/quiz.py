@@ -22,7 +22,7 @@ CORS(app)
 
 class Quizzes(db.Model):
     __tablename__ = 'quizzes'
-    quizID = db.Column(db.Integer(), primary_key=True)
+    quizID = db.Column(db.Integer, primary_key=True)
     classID = db.Column(db.String(5), primary_key=True)
     sectionID = db.Column(db.String(10))
     active = db.Column(db.Boolean)
@@ -91,7 +91,6 @@ def get_quiz_info(quizID):
 def get_classes(trainerID):
     classes = Classes.query.filter_by(trainerAssignedID=trainerID).all()
     
-
     if classes:
             return jsonify({
                 "data": [clas.to_dict() for clas in classes]
@@ -100,6 +99,7 @@ def get_classes(trainerID):
         return jsonify({
             "message": "Person not found."
         }), 404
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003, debug=True)
