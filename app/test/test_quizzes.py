@@ -40,17 +40,16 @@ class TestQuizzes(TestApp):
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
-        print(response.json)
         
         self.assertEqual(response.json, 
-        {'active': 1,
-         'answer': 'Chicken',
-         'classID': 'IS111',
-         'question': 'What came first?',
-         'questionNumber': 1,
-         'quizID': 2,
-         'sectionID': 'G6',
-         'selections': {'selection': ['chicken', 'egg', 'hen', 'rooster']}})
+        {"quizID": 2,
+         "classID": "IS111",
+         "sectionID": "G6",
+         "active": 1,
+         "answer": "Chicken",
+         "questionNumber": 1,
+         "question": "What came first?",
+         "selections": {"selection": ["chicken", "egg", "hen", "rooster"]}})
 
 
 if __name__ == '__main__':
