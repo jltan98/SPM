@@ -5,8 +5,7 @@ import sys
 import os
 sys.path.append('./app')
 if True:  # noqa: E402
-    from src.quiz import db, Quizzes, QuizInfo
-    from src.quizzes import app
+    from src.quizzes import db, app
 
 
 # Group Member: ALVIN NGOW FENG HAO
