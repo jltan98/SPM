@@ -25,7 +25,7 @@ class TestApp(flask_testing.TestCase):
         db.drop_all()
 
 
-class TestQuiz(TestApp):
+class TestLearner(TestApp):
     def test_getQuizzes(self):
         quizzes = Quizzes(quizID=2,
                           classID='IS111',
@@ -36,16 +36,17 @@ class TestQuiz(TestApp):
 
         url = "/quiz"
         response = self.client.get(url)
-        # quiz_dict = response.data.decode('utf8')
-        # returnVal = json.loads(quiz_dict)
-        print(response)
+        quiz_dict = response.data.decode('utf8')
+        returnVal = json.loads(quiz_dict)
+        print(returnVal)
+        print(quiz_dict)
         # expectedValue = {"data":"[{\"quizID\": 2, \"classID\": \"IS111\", \"sectionID\": \"G6\", \"active\": true}]"}
         expectedValue = {"data":
-                            [{'quizID': 2, 
-                            'classID':"IS111",
-                            'sectionID': "G6",
-                            'active': "true"}]}
-        self.assertEqual(expectedValue, response)
+                [{'quizID': 2, 
+                  'classID':"IS111",
+                  'sectionID': "G6",
+                  'active': "true"}]}
+        self.assertEqual(expectedValue, quiz_dict)
 
 
 if __name__ == "__main__":
