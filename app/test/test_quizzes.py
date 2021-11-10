@@ -48,14 +48,19 @@ class TestQuizzes(TestApp):
         db.session.commit()
 
         request_body = {
-            'quizID': q.quizID,
-            'classID': q.classID,
-            'sectionID': q.sectionID,
-            'active': q.active,
-            'answer':qi.answer,
-            'questionNumber': qi.questionNumber,
-            'question': qi.question,
-            'selections': qi.selections,
+            'quizID': 2,
+            'classID': 'IS111',
+            'sectionID': 'G6',
+            'active': 1,
+            'answer': 'Chicken',
+            'questionNumber': 1,
+            'question': 'What came first?',
+            'selections': {"selection": ["chicken",
+                                         "egg",
+                                         "hen",
+                                         "rooster"
+                                        ]
+                            },
         }
 
         response = self.client.post("/enter_quiz",
