@@ -35,10 +35,10 @@ class TestQuizzes(TestApp):
                 "questionNumber": 1,
                 "question": "What came first?",
                 "selections": {"selection":
-                              ["chicken",
-                               "egg",
-                               "hen",
-                               "rooster"]}}
+                                ["chicken",
+                                "egg",
+                                "hen",
+                                "rooster"]}}
 
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
@@ -46,17 +46,17 @@ class TestQuizzes(TestApp):
 
         self.assertEqual(response.json,
                         {"quizID": 2,
-                        "classID": "IS111",
-                        "sectionID": "G6",
-                        "active": 1,
-                        "answer": "Chicken",
-                        "questionNumber": 1,
-                        "question": "What came first?",
-                        "selections": {"selection":
-                                      ["chicken",
-                                       "egg",
-                                       "hen",
-                                       "rooster"]}})
+                         "classID": "IS111",
+                         "sectionID": "G6",
+                         "active": 1,
+                         "answer": "Chicken",
+                         "questionNumber": 1,
+                         "question": "What came first?",
+                         "selections": {"selection":
+                                            ["chicken",
+                                            "egg",
+                                            "hen",
+                                            "rooster"]}})
 
 
 if __name__ == '__main__':
