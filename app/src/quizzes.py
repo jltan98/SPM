@@ -2,6 +2,11 @@ import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import sys
+sys.path.append('./app/src')
+if True:  # noqa: E402
+    from quiz import Quizzes, QuizInfo
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('dbURL')
@@ -20,27 +25,27 @@ def shutdown_session(exception=None):
     db.session.remove()
 
 
-class Quizzes(db.Model):
-    __tablename__ = 'quizzes'
+# class Quizzes(db.Model):
+#     __tablename__ = 'quizzes'
 
-    quizID = db.Column(db.Integer, primary_key=True)
-    classID = db.Column(db.String(5))
-    sectionID = db.Column(db.String(10))
-    active = db.Column(db.Boolean)
-
-
-class QuizInfo(db.Model):
-    __tablename__ = 'quizInfo'
-
-    quizID = db.Column(db.Integer, primary_key=True)
-    questionNumber = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.Text())
-    answer = db.Column(db.Text())
-    selections = db.Column(db.JSON)
+#     quizID = db.Column(db.Integer, primary_key=True)
+#     classID = db.Column(db.String(5))
+#     sectionID = db.Column(db.String(10))
+#     active = db.Column(db.Boolean)
 
 
-@app.route("/enterquiz", methods=['POST', 'PUT'])
-def register():
+# class QuizInfo(db.Model):
+#     __tablename__ = 'quizInfo'
+
+#     quizID = db.Column(db.Integer, primary_key=True)
+#     questionNumber = db.Column(db.Integer, primary_key=True)
+#     question = db.Column(db.Text())
+#     answer = db.Column(db.Text())
+#     selections = db.Column(db.JSON)
+
+
+@app.route("/enterquiz", methods=['POST'])
+def enterQuiz():
     data = request.get_json()
     if not all(key in data.keys() for
                key in ('quizID', 'classID', 'sectionID', 'active',
@@ -49,8 +54,6 @@ def register():
         return jsonify({
             "message": "Incorrect JSON object provided."
         }), 500
-
-    print(data['quizID'])
 
     quiz = Quizzes(
         quizID=data['quizID'],
@@ -70,7 +73,7 @@ def register():
     db.session.add(quiz)
     db.session.add(quizInfo)
     db.session.commit()
-    return data
+    return jsonify({quiz.todict()}, quizInfo.todict())
 
 
 if __name__ == '__main__':
