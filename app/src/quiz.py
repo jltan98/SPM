@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 import os
 import sys
 import json
@@ -87,6 +87,7 @@ def get_quiz_info(quizID):
             "message": "Person not found."
         }), 404
 
+
 @app.route("/classes/<trainerID>", methods=['GET'])
 def get_classes(trainerID):
     classes = Classes.query.filter_by(trainerAssignedID=trainerID).all()
@@ -100,6 +101,40 @@ def get_classes(trainerID):
         return jsonify({
             "message": "Person not found."
         }), 404
+
+
+@app.route("/enterquiz", methods=['POST'])
+def register():
+    data = request.get_json()
+    if not all(key in data.keys() for
+               key in ('quizID', 'classID', 'sectionID', 'active',
+                       'questionNumber', 'question',
+                       'answer', 'selections')):
+        return jsonify({
+            "message": "Incorrect JSON object provided."
+        }), 500
+
+    print(data['quizID'])
+
+    quiz = Quizzes(
+        quizID=data['quizID'],
+        classID=data['classID'],
+        sectionID=data['sectionID'],
+        active=data['active']
+    )
+
+    quizInfo = QuizInfo(
+        quizID=data['quizID'],
+        questionNumber=data['questionNumber'],
+        question=data['question'],
+        answer=data['answer'],
+        selections=data['selections']
+    )
+
+    db.session.add(quiz)
+    db.session.add(quizInfo)
+    db.session.commit()
+    return data
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003, debug=True)
