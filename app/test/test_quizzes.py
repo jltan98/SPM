@@ -52,14 +52,14 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections": {
+                "selections": set({
                     "selection": [
                         "chicken",
                         "egg",
                         "hen",
                         "rooster"
                     ]
-                }
+                })
             }
         }
 
