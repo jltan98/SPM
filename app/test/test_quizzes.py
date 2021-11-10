@@ -35,7 +35,7 @@ class TestQuizzes(TestApp):
                 "questionNumber": 1,
                 "question": "What came first?",
                 "selections": {"selection":
-                                ["chicken",
+                              ["chicken",
                                 "egg",
                                 "hen",
                                 "rooster"]}}
@@ -53,10 +53,10 @@ class TestQuizzes(TestApp):
                          "questionNumber": 1,
                          "question": "What came first?",
                          "selections": {"selection":
-                                            ["chicken",
-                                            "egg",
-                                            "hen",
-                                            "rooster"]}})
+                                        ["chicken",
+                                          "egg",
+                                          "hen",
+                                          "rooster"]}})
 
 
 if __name__ == '__main__':
