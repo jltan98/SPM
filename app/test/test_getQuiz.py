@@ -38,14 +38,7 @@ class TestLearner(TestApp):
         response = self.client.get(url)
         quiz_dict = response.data.decode('utf8')
         returnVal = json.loads(quiz_dict)
-        print(returnVal)
-        print(quiz_dict)
-        # expectedValue = {"data":"[{\"quizID\": 2, \"classID\": \"IS111\", \"sectionID\": \"G6\", \"active\": true}]"}
-        expectedValue = {"data":
-                [{'quizID': 2, 
-                  'classID':"IS111",
-                  'sectionID': "G6",
-                  'active': "true"}]}
+        expectedValue = {'data': '[{"quizID": 2, "classID": "IS111", "sectionID": "G6", "active": true}]'}
         self.assertEqual(expectedValue, returnVal)
 
 
