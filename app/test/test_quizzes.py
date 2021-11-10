@@ -1,4 +1,6 @@
 import unittest
+
+from flask.json import jsonify
 import flask_testing
 import json
 import sys
@@ -36,7 +38,7 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections={"options": ["chicken","egg","hen","rooster"]}
+                      selections=jsonify({"options": ["chicken","egg","hen","rooster"]})
                       )
 
         db.session.add(q)
@@ -52,10 +54,9 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections": {
-                    "options": [
-                        "chicken","egg","hen","rooster"]
-                }
+                "selections": jsonify({
+                    "options": ["chicken","egg","hen","rooster"]
+                })
             }
         }
 
