@@ -47,6 +47,8 @@ def shutdown_session(exception=None):
 @app.route("/enterquiz", methods=['POST'])
 def enterQuiz():
     data = request.get_json()
+    data1 = request.json
+    print("test"+data+"check" + data1)
     if not all(key in data.keys() for
                key in ('quizID', 'classID', 'sectionID', 'active',
                        'questionNumber', 'question',
