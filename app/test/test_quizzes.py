@@ -5,7 +5,8 @@ import sys
 import os
 sys.path.append('./app')
 if True:  # noqa: E402
-    from src.quiz import app, db, Quizzes, QuizInfo
+    from src.quiz import db, Quizzes, QuizInfo
+    from src.quizzes import app
 
 
 # Group Member: ALVIN NGOW FENG HAO
@@ -36,7 +37,7 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections='{"selection": ["chicken", "egg", "hen", "rooster"]}'
+                      selections={"selection": ["chicken", "egg", "hen", "rooster"]}
                       )
 
         db.session.add(q)
@@ -52,7 +53,7 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections":'{"selection": ["chicken", "egg", "hen", "rooster"]}'
+                "selections": {"selection": ["chicken", "egg", "hen", "rooster"]}
             }
         }
 
