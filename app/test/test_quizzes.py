@@ -34,7 +34,11 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections": {"selection": ["chicken", "egg", "hen", "rooster"]}}
+                "selections": {"selection":
+                                ["chicken",
+                                 "egg",
+                                 "hen",
+                                 "rooster"]}}
 
         response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
@@ -53,4 +57,3 @@ class TestQuizzes(TestApp):
 
 if __name__ == '__main__':
     unittest.main()
-
