@@ -41,10 +41,10 @@ class Quizzes(db.Model):
 
 class QuizInfo(db.Model):
     __tablename__ = 'quizinfo'
-    quizID = db.Column(db.Integer(), primary_key=True)
-    questionNumber = db.Column(db.Integer(), primary_key=True)
-    question = db.Column(db.Text())
-    answer= db.Column(db.Text())
+    quizID = db.Column(db.Integer, primary_key=True)
+    questionNumber = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.Text)
+    answer = db.Column(db.Text)
     selections = db.Column(db.JSON)
 
     def to_dict(self):
@@ -64,9 +64,9 @@ def get_quiz():
     quizzes = Quizzes.query.all()
 
     if quizzes:
-            return jsonify({
-                "data": [quiz.to_dict() for quiz in quizzes]
-            }), 200
+        return jsonify({
+            "data": [quiz.to_dict() for quiz in quizzes]
+        }), 200
     else:
         return jsonify({
             "message": "Person not found."
@@ -90,11 +90,11 @@ def get_quiz_info(quizID):
 @app.route("/classes/<trainerID>", methods=['GET'])
 def get_classes(trainerID):
     classes = Classes.query.filter_by(trainerAssignedID=trainerID).all()
-    
+
     if classes:
-            return jsonify({
-                "data": [clas.to_dict() for clas in classes]
-            }), 200
+        return jsonify({
+            "data": [clas.to_dict() for clas in classes]
+        }), 200
     else:
         return jsonify({
             "message": "Person not found."
