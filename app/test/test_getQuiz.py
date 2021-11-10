@@ -42,7 +42,7 @@ class TestQuiz(TestApp):
             {'quizID': 2, 
             'classID': 'IS111', 
             'sectionID': 'G6',
-            'active': True, }]}
+            'active': True}]}
         self.assertEqual(expectedValue, returnVal)
 
 
