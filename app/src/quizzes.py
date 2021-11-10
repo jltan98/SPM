@@ -39,7 +39,7 @@ class QuizInfo(db.Model):
     selections = db.Column(db.JSON)
 
 
-@app.route("/enter_quiz", methods=['POST'])
+@app.route("/enterquiz", methods=['POST', 'PUT'])
 def register():
     data = request.get_json()
     if not all(key in data.keys() for

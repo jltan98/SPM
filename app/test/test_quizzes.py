@@ -59,11 +59,10 @@ class TestQuizzes(TestApp):
             'selections': qi.selections,
         }
 
-        response = self.client.post("/enter_quiz/",
+        response = self.client.post("/enter_quiz",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
         print(response)
-        print(response.data)
         print(response.json)
         self.assertEqual(response.json, {
             'quizID': 2,
