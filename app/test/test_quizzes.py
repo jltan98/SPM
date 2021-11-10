@@ -54,9 +54,9 @@ class TestQuizzes(TestApp):
                 "answer": "Chicken",
                 "questionNumber": 1,
                 "question": "What came first?",
-                "selections": jsonify({
-                    "options": ["chicken","egg","hen","rooster"]
-                })
+                "selections": {
+                    "options": "[chicken, egg, hen, rooster]"
+                }
             }
         }
 
