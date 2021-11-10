@@ -36,7 +36,7 @@ class TestQuizzes(TestApp):
                       questionNumber=1,
                       answer='Chicken',
                       question="What came first?",
-                      selections={"selection": ["chicken", "egg", "hen", "rooster"]}
+                      selections='{"selection": ["chicken", "egg", "hen", "rooster"]}'
                       )
 
         db.session.add(q)
@@ -57,7 +57,7 @@ class TestQuizzes(TestApp):
         }
 
         response = self.client.post("/enter_quiz",
-                                    data=json.dumps(request_body),
+                                    data=json.loads(request_body),
                                     content_type='application/json')
         print(response)
         print(response.json)
