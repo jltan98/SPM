@@ -2,7 +2,6 @@ import sys
 import unittest
 import flask_testing
 import json
-from datetime import datetime
 sys.path.append('./app')
 if True:  # noqa: E402
     from src.quiz import db, app, Quizzes
@@ -39,10 +38,11 @@ class TestQuiz(TestApp):
         quiz_dict = response.data.decode('utf8')
         returnVal = json.loads(quiz_dict)
         expectedValue = {'data': [
-            {'quizID': 2, 
-            'classID': 'IS111', 
-            'sectionID': 'G6',
-            'active': True}]}
+            {'quizID': 2,
+             'classID': 'IS111',
+             'sectionID': 'G6',
+             'active': True}]}
+
         self.assertEqual(expectedValue, returnVal)
 
 
