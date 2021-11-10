@@ -28,21 +28,21 @@ class TestApp(flask_testing.TestCase):
 
 class TestQuizzes(TestApp):
     def test_create_quiz(self):
-        q = Quizzes(quizID=2,
-                    classID='IS111',
-                    sectionID='G6',
-                    active=1)
+        # q = Quizzes(quizID=2,
+        #             classID='IS111',
+        #             sectionID='G6',
+        #             active=1)
 
-        qi = QuizInfo(quizID=2,
-                      questionNumber=1,
-                      answer='Chicken',
-                      question="What came first?",
-                      selections={"selection": ["chicken", "egg", "hen", "rooster"]}
-                      )
+        # qi = QuizInfo(quizID=2,
+        #               questionNumber=1,
+        #               answer='Chicken',
+        #               question="What came first?",
+        #               selections={"selection": ["chicken", "egg", "hen", "rooster"]}
+        #               )
 
-        db.session.add(q)
-        db.session.add(qi)
-        db.session.commit()
+        # db.session.add(q)
+        # db.session.add(qi)
+        # db.session.commit()
 
         request_body = {
             {
@@ -58,7 +58,7 @@ class TestQuizzes(TestApp):
         }
 
         response = self.client.post("/enter_quiz",
-                                    data=json.loads(request_body),
+                                    data=json.dumps(request_body),
                                     content_type='application/json')
         print(response)
         print(response.json)
