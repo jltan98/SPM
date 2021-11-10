@@ -41,7 +41,7 @@ class TestLearner(TestApp):
         expectedValue = bytes({'quizID': 2,
                          'classID': "IS111",
                          'sectionID': "G6",
-                         'active': ,
+                         'active': 'true',
                         })
         self.assertEqual(expectedValue, returnVal)
 
