@@ -25,7 +25,7 @@ class TestApp(flask_testing.TestCase):
         db.drop_all()
 
 
-class TestgetQuiz(TestApp):
+class TestQuiz(TestApp):
     def test_getQuizzes(self):
         quizzes = Quizzes(quizID=2,
                           classID='IS111',
@@ -38,6 +38,7 @@ class TestgetQuiz(TestApp):
         response = self.client.get(url)
         quiz_dict = response.data.decode('utf8')
         returnVal = json.loads(quiz_dict)
+        print(returnVal)
         expectedValue = {'data': '[{"quizID": 2, "classID": "IS111", "sectionID": "G6", "active": true}]'}
         self.assertEqual(expectedValue, returnVal)
 
