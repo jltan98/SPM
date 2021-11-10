@@ -73,7 +73,7 @@ def enterQuiz():
     db.session.add(quiz)
     db.session.add(quizInfo)
     db.session.commit()
-    return jsonify({quiz.todict()}, quizInfo.todict())
+    return data
 
 
 if __name__ == '__main__':
