@@ -46,7 +46,7 @@ class TestLearner(TestApp):
                   'classID':"IS111",
                   'sectionID': "G6",
                   'active': "true"}]}
-        self.assertEqual(expectedValue, quiz_dict)
+        self.assertEqual(expectedValue, returnVal)
 
 
 if __name__ == "__main__":
